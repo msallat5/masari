@@ -3,9 +3,12 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "homepage": "https://msallat5.github.io/masari",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -17,6 +20,7 @@
     "axios": "^1.9.0",
     "bootstrap-icons": "^1.13.1",
     "dayjs": "^1.11.10",
+    "gh-pages": "^6.3.0",
     "i18next": "^25.1.2",
     "less": "^4.3.0",
     "pdfjs-dist": "^3.4.120",
@@ -32,7 +36,7 @@
   "devDependencies": {
     "@eslint/js": "^9.25.0",
     "@types/react": "^19.1.2",
-    "@types/react-dom": "^19.1.2",
+    "@types-react-dom": "^19.1.2",
     "@vitejs/plugin-react": "^4.4.1",
     "eslint": "^9.25.0",
     "eslint-plugin-react-hooks": "^5.2.0",

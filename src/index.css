@@ -1,1085 +1,920 @@
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap');
-
-:root {
-  font-family: Cairo, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
-  /* Baseline CSS variables with fallbacks */
-  /* These get properly set by useTheme.tsx but are defined here for SSR and initial render */
-  --color-primary: #76A9FA;
-  --bg-color: #F8FAFC;
-  --card-bg: #FFFFFF;
-  --text-color: #2C3E50;
-  --text-color-secondary: #4A5568;
-  --border-color: #E2E8F0;
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.03);
-  --shadow-md: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 6px -1px rgba(0, 0, 0, 0.02);
-  --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.08);
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --spacing-xs: 4px;
-  --spacing-sm: 8px;
-  --spacing-md: 16px;
-  --spacing-lg: 24px;
-  --spacing-xl: 32px;
-}
-
-[data-theme="dark"] {
-  --color-primary: #76ABAE;
-  --bg-color: #121212;
-  --card-bg: #1E1E1E;
-  --text-color: #FFFFFF;
-  --text-color-secondary: #CCCCCC;
-  --border-color: #333333;
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
-  --shadow-md: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 6px -1px rgba(0, 0, 0, 0.25);
-  --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.5);
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  transition: background-color 0.3s, border-color 0.3s, color 0.2s;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-
-a:hover {
-  color: #535bf2;
-}
-
-body {
-  margin: 0;
-  display: block;
-  min-width: 320px;
-  min-height: 100vh;
-  background-color: transparent;
-  font-family: inherit;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-
-button:hover {
-  border-color: #646cff;
-}
-
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-
-  a:hover {
-    color: #747bff;
-  }
-
-  button {
-    background-color: #f9f9f9;
-  }
-}
-
-/* RTL specific adjustments */
-html[dir="rtl"] {
-  text-align: right;
-}
-
-html[dir="rtl"] .ant-menu-submenu-title {
-  padding-right: 16px !important;
-  padding-left: 0 !important;
-}
-
-/* Handle Arabic font */
-html[lang="ar"] {
-  font-family: "Cairo";
-}
-
-html[lang="ar"] * {
-  letter-spacing: 0;
-}
-
-html[lang="ar"] h1,
-html[lang="ar"] h2,
-html[lang="ar"] h3,
-html[lang="ar"] h4,
-html[lang="ar"] h5,
-html[lang="ar"] h6,
-html[lang="ar"] .ant-typography-h1,
-html[lang="ar"] .ant-typography-h2,
-html[lang="ar"] .ant-typography-h3,
-html[lang="ar"] .ant-typography-h4,
-html[lang="ar"] .ant-typography-h5,
-html[lang="ar"] .ant-typography-h6 {
-  font-family: "Cairo";
-  font-weight: 700;
-}
-
-/* Responsive Layout Utilities */
-.form-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 24px;
-  margin-bottom: 24px;
-}
-
-.application-form .ant-form-item {
-  margin-bottom: 24px;
-}
-
-.application-form .status-select {
-  min-width: 100%;
-}
-
-/* Layout spacing improvements */
-.ant-layout-content {
-  padding: 24px !important;
-}
-
-.ant-card {
-  margin-bottom: 24px;
-  border-radius: 16px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02);
-  overflow: hidden;
-}
-
-.ant-card-head {
-  padding: 0 24px;
-  min-height: 60px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-}
-
-.ant-card-body {
-  padding: 24px;
-}
-
-.ant-descriptions-item {
-  padding: 12px 0;
-}
-
-.ant-table {
-  border-radius: 16px;
-  overflow: hidden;
-}
-
-.ant-table-cell {
-  padding: 16px !important;
-}
-
-.ant-table-thead>tr>th {
-  padding: 16px !important;
-  font-weight: 500;
-}
-
-.ant-btn {
-  border-radius: 8px;
-  padding: 6px 16px;
-  height: auto;
-}
-
-.ant-tag {
-  border-radius: 16px;
-  font-size: 0.85rem;
-  padding: 3px 10px;
-  line-height: 1.4;
-}
-
-.ant-select {
-  width: 100%;
-}
-
-.ant-input,
-.ant-select-selector {
-  border-radius: 8px !important;
-  padding: 8px 12px !important;
-}
-
-.ant-select-selector {
-  height: auto !important;
-  min-height: 40px !important;
-}
-
-.ant-modal-content {
-  border-radius: 16px;
-  padding: 24px;
-}
-
-.ant-modal-header {
-  margin-bottom: 24px;
-}
-
-.ant-form-item-label>label {
-  font-weight: 500;
-}
-
-/* Responsive Table */
-@media (max-width: 768px) {
-  .ant-table {
-    font-size: 0.85rem;
-  }
-
-  .ant-table-cell {
-    padding: 12px !important;
-  }
-
-  .responsive-hide-sm {
-    display: none !important;
-  }
-
-  .ant-layout-content {
-    padding: 16px !important;
-  }
-
-  .form-grid {
-    gap: 16px;
-    margin-bottom: 16px;
-  }
-
-  .ant-card-body {
-    padding: 16px;
-  }
-
-  .ant-card-head {
-    padding: 0 16px;
-    min-height: 54px;
-  }
-}
-
-/* RTL Support - Additional */
-[dir="rtl"] .ant-btn-icon-only {
-  transform: scaleX(-1);
-}
-
-[dir="rtl"] .ant-form-item-label {
-  text-align: right;
-}
-
-[dir="rtl"] .ant-picker-suffix {
-  margin-right: 4px;
-  margin-left: 0;
-}
-
-[dir="rtl"] .ant-picker-clear {
-  right: auto;
-  left: 0;
-}
-
-[dir="rtl"] .ant-select-arrow {
-  right: auto;
-  left: 11px;
-}
-
-[dir="rtl"] .ant-select-selection-item {
-  text-align: right;
-}
-
-[dir="rtl"] .ant-input-affix-wrapper .ant-input-suffix {
-  margin-left: 0;
-  margin-right: 4px;
-}
-
-/* Mobile Bottom Navigation */
-.mobile-nav-menu .ant-menu-item {
-  padding: 0 !important;
-  margin: 0 !important;
-}
-
-.mobile-nav-menu .anticon {
-  font-size: 1.2rem;
-  margin: 0 !important;
-}
-
-/* App Header */
-.app-title {
-  font-size: 1.2rem;
-  font-weight: bold;
-}
-
-/* Dashboard styles */
-.dashboard-header {
-  margin-bottom: 32px;
-}
-
-.dashboard-header h1 {
-  margin-bottom: 8px;
-  font-size: 32px;
-}
-
-.dashboard-header h4 {
-  font-weight: normal;
-  opacity: 0.8;
-  margin-bottom: 24px;
-}
-
-/* Dashboard Stats */
-.dashboard-stats .ant-card {
-  height: 100%;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  transform: translateY(0);
-  border: 1px solid var(--border-color);
-}
-
-.dashboard-stats .ant-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-  border-color: var(--color-primary);
-}
-
-[data-theme="dark"] .dashboard-stats .ant-card {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-[data-theme="dark"] .dashboard-stats .ant-card:hover {
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
-  border-color: var(--color-primary);
-}
-
-.dashboard-stats .ant-statistic-content {
-  font-size: 28px;
-  font-weight: 600;
-}
-
-.dashboard-stats .ant-card-body {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-}
-
-@media (max-width: 576px) {
-  .dashboard-stats .ant-col {
-    overflow: hidden;
-    transition: max-height 0.4s ease, opacity 0.4s ease;
-  }
-  /* collapsed: hide cols 3+ */
-  .dashboard-stats:not(.expanded) > .ant-col:nth-child(n+3) {
-    max-height: 0;
-    opacity: 0;
-  }
-  /* expanded: ensure they can grow */
-  .dashboard-stats.expanded > .ant-col:nth-child(n+3) {
-    max-height: 300px; /* should exceed your card height */
-    opacity: 1;
-  }
-}
-
-/* ––– toggle button styling ––– */
-.dashboard-toggle {
-  text-align: center;
-  margin-top: 16px;
-}
-.dashboard-toggle .ant-btn {
-  color: var(--color-primary);
-  font-weight: 600;
-  font-size: 14px;
-  padding: 0;
-  border: none;
-  transition: color 0.3s;
-}
-.dashboard-toggle .ant-btn:hover {
-  text-decoration: underline;
-}
-
-.recent-application-item {
-  cursor: pointer;
-  transition: background-color 0.2s;
-  padding: 12px 16px;
-  border-radius: 8px;
-}
-
-.recent-application-item:hover {
-  background-color: rgba(0, 0, 0, 0.03);
-}
-
-[data-theme="dark"] .recent-application-item:hover {
-  background-color: rgba(255, 255, 255, 0.05);
-}
-
-@media (max-width: 768px) {
-  .dashboard-header h1 {
-    font-size: 24px;
-  }
-
-  .dashboard-header h4 {
-    font-size: 14px;
-  }
-}
-
-/* Timeline Styling */
-.timeline-container {
-  padding-top: 12px;
-}
-
-.timeline-actions {
-  margin-bottom: 16px;
-  padding-bottom: 12px;
-  border-bottom: 1px dashed var(--border-color);
-}
-
-.note-input-area {
-  background-color: var(--bg-color);
-  padding: 12px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-color);
-  margin-bottom: 16px;
-}
-
-/* Timeline Responsiveness */
-@media (max-width: 768px) {
-  .ant-timeline {
-    margin-left: 0;
-  }
-
-  .ant-timeline-item-label {
-    width: auto !important;
-    text-align: start !important;
-  }
-}
-
-/* Improve Card Layout */
-.layout-card {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  transition: all 0.3s ease;
-}
-
-.layout-card .ant-card-body {
-  flex: 1;
-}
-
-/* Detail page responsive layout */
-.detail-page-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 24px;
-}
-
-/* Modal responsiveness */
-@media (max-width: 768px) {
-  .ant-modal {
-    max-width: calc(100vw - 32px) !important;
-    margin: 0 16px !important;
-  }
-}
-
-/* Calendar responsiveness */
-.ant-picker-calendar-full .ant-picker-panel {
-  display: block;
-}
-
-@media (max-width: 768px) {
-  .ant-picker-calendar-full .ant-picker-calendar-date-content {
-    height: auto !important;
-    min-height: 40px;
-  }
-}
-
-/* Ensure proper background coloring */
-#root {
-  width: 100%;
-  min-height: 100vh;
-}
-
-/* Fix sidebar shadow for RTL */
-[dir="rtl"] .ant-layout-sider {
-  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.06);
-}
-
-/* Fix icon flipping in RTL mode */
-[dir="rtl"] .ant-btn>.anticon:not(.ant-btn-rtl-icon-only) {
-  transform: scaleX(-1);
-}
-
-/* Mobile Bottom Navigation */
-.mobile-nav-menu.ant-menu-horizontal {
-  border-bottom: none;
-  line-height: normal;
-}
-
-/* Fix language toggle button */
-.lang-toggle-btn {
-  min-width: 42px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Bootstrap icons styling */
-.bi {
-  display: inline-block;
-  vertical-align: middle;
-  line-height: 1;
-  color: var(--text-color);
-}
-
-.bi-globe2 {
-  font-size: 1.2rem !important;
-}
-
-/* Custom icons styling */
-.custom-icon {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  vertical-align: -0.125em !important;
-}
-
-.ant-btn .custom-icon {
-  margin-right: 4px;
-}
-
-[dir="rtl"] .ant-btn .custom-icon {
-  margin-right: 0;
-  margin-left: 4px;
-}
-
-/* Chart styles */
-.recharts-wrapper {
-  direction: ltr !important;
-}
-
-.chart-placeholder {
-  height: 300px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 1.2rem;
-  opacity: 0.6;
-}
-
-/* Fix the chart container colors */
-.recharts-cartesian-grid-bg {
-  fill: transparent;
-}
-
-.recharts-pie-label-text {
-  font-size: 0.8rem;
-  font-weight: bold;
-}
-
-/* Improve dark mode charts */
-[data-theme="dark"] .recharts-cartesian-axis-line,
-[data-theme="dark"] .recharts-cartesian-axis-tick-line,
-[data-theme="dark"] .recharts-cartesian-grid-horizontal line,
-[data-theme="dark"] .recharts-cartesian-grid-vertical line {
-  stroke: rgba(255, 255, 255, 0.2);
-}
-
-[data-theme="dark"] .recharts-cartesian-axis-tick-value {
-  fill: rgba(255, 255, 255, 0.65);
-}
-
-[data-theme="dark"] .recharts-legend-item-text {
-  color: rgba(255, 255, 255, 0.65);
-}
-
-/* Page Headers */
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-  flex-wrap: wrap;
-  gap: 16px;
-}
-
-.page-header h1 {
-  font-size: 28px;
-  margin: 0;
-  padding: 0;
-  font-weight: 600;
-  color: inherit;
-  line-height: 1.3;
-}
-
-/* Status Update Section */
-.status-update-section {
-  margin-bottom: 24px;
-}
-
-.status-update-section h3 {
-  margin-bottom: 16px;
-  font-size: 18px;
-  font-weight: 500;
-}
-
-.status-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 16px;
-}
-
-.status-button {
-  margin-bottom: 8px;
-}
-
-/* Calendar Styles */
-.calendar-page .ant-picker-calendar {
-  background: transparent;
-}
-
-.calendar-card {
-  padding: 0;
-  overflow: hidden;
-}
-
-.calendar-card .ant-card-body {
-  padding: 0;
-}
-
-.calendar-header {
-  padding: 16px 16px 0;
-  margin-bottom: 32px;
-  display: flex;
-  flex-direction: row;
-  /* always lay out children in source order */
-  justify-content: flex-end;
-  /* align to the right in LTR */
-  align-items: center;
-}
-
-[dir="rtl"] .calendar-header {
-  direction: ltr;
-  justify-content: flex-start;
-}
-
-.calendar-header .ant-select {
-  height: 32px;
-}
-
-.calendar-header .ant-select-selector {
-  height: 32px !important;
-  display: flex;
-  align-items: center;
-}
-
-@media (max-width: 576px) {
-  .calendar-header .ant-space {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  [dir="rtl"] .calendar-header .ant-space {
-    flex-direction: column;
-    align-items: flex-end;
-  }
-
-  .calendar-header .ant-space-item {
-    margin-bottom: 16px !important;
-  }
-}
-
-.calendar-events {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  max-height: 100px;
-  overflow-y: auto;
-}
-
-.calendar-event-item {
-  margin-bottom: 4px;
-  line-height: 1.5;
-}
-
-.calendar-event-badge {
-  cursor: pointer;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
-  display: block;
-}
-
-/* Styling for Ant Design calendar cell content */
-.events {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.events .ant-badge-status {
-  width: 100%;
-  overflow: hidden;
-  font-size: 12px;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.notes-month {
-  font-size: 28px;
-  text-align: center;
-}
-
-.notes-month section {
-  font-size: 28px;
-}
-
-.calendar-empty-state {
-  padding: 60px 0;
-}
-
-.ant-picker-calendar-date-content {
-  height: auto !important;
-  min-height: 80px;
-}
-
-/* Theme toggle button animation */
-.theme-toggle-btn {
-  transition: transform 0.3s ease;
-}
-
-.theme-toggle-btn:hover {
-  transform: rotate(30deg);
-}
-/* ─── Mobile: calendar “dots only” ────────────────────────────────────────── */
-@media (max-width: 576px) {
-  /* make each day’s events wrap into a dot‐cloud */
-  .calendar-events {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-    overflow: visible !important;
-    max-height: none !important;
-    padding: 2px;
-  }
-
-  /* each li just contributes its dot, no extra spacing */
-  .calendar-events li {
-    margin: 0 !important;
-    flex: 0 0 auto;
-    width: 8px;    /* tweak to match your badge‐dot size */
-    height: 8px;
-    line-height: 1;
-  }
-
-  /* hide the text, leave only the colored status dot */
-  .calendar-events li .ant-badge-status-text {
-    display: none !important;
-  }
-}
-/* Application Detail Page */
-.application-detail-page .page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.application-detail-page .header-left {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.application-detail-page .header-left h1 {
-  margin: 0;
-  font-size: 28px;
-}
-.application-detail-page[dir="rtl"] .header-left {
-  flex-direction: row-reverse;
-}
-
-.application-detail-page .section-title {
-  font-size: 20px;
-  font-weight: 600;
-  margin-bottom: 16px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.application-detail-page .section-container {
-  margin-bottom: 24px;
-}
-
-.timeline-container {
-  padding-top: 12px;
-}
-
-/* Day details modal */
-.day-details {
-  max-height: 400px;
-  overflow-y: auto;
-  padding: 8px 0;
-}
-
-[dir="rtl"] .day-details {
-  direction: rtl;
-}
-
-.day-details .ant-card-body {
-  padding: 12px;
-}
-
-.day-details .ant-card {
-  transition: all 0.2s;
-  cursor: pointer;
-}
-
-.text-right {
-  text-align: right;
-}
-
-.text-left {
-  text-align: left;
-}
-
-/* RTL padding and margin fixes */
-[dir="rtl"] .ant-card-head-title {
-  padding-right: 0;
-  padding-left: 24px;
-}
-
-[dir="rtl"] .ant-card-extra {
-  margin-left: 0;
-  margin-right: auto;
-  padding-right: 24px;
-  padding-left: 0;
-}
-
-/* Theme and language toggle spacing */
-.theme-toggle-btn,
-.lang-toggle-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-}
-
-.theme-toggle-btn .anticon,
-.lang-toggle-btn .anticon {
-  font-size: 18px;
-}
-
-/* Animation for theme change */
-.ant-layout,
-.ant-card,
-.ant-menu,
-.ant-table,
-.ant-btn,
-.ant-input,
-.ant-select-selector,
-.ant-modal-content {
-  transition: all 0.3s ease;
-}
-
-/* Improved focus styles */
-.ant-btn:focus,
-.ant-input:focus,
-.ant-select-focused .ant-select-selector {
-  box-shadow: 0 0 0 2px rgba(118, 169, 250, 0.2);
-}
-
-[data-theme="dark"] .ant-btn:focus,
-[data-theme="dark"] .ant-input:focus,
-[data-theme="dark"] .ant-select-focused .ant-select-selector {
-  box-shadow: 0 0 0 2px rgba(118, 171, 174, 0.2);
-}
-
-/* Improve tables in RTL mode */
-[dir="rtl"] .ant-table-cell {
-  text-align: right;
-}
-
-/* Arabic font specific adjustments */
-html[lang="ar"] .ant-btn,
-html[lang="ar"] .ant-input,
-html[lang="ar"] .ant-select-selection-item,
-html[lang="ar"] .ant-menu-title-content,
-html[lang="ar"] .ant-card-head-title,
-html[lang="ar"] .ant-form-item-label>label,
-html[lang="ar"] .ant-statistic-title,
-html[lang="ar"] .ant-statistic-content {
-  font-family: 'Cairo';
-}
-
-/* Navigation menu spacing */
-.nav-menu .ant-menu-item {
-  margin: 12px 0 !important;
-  padding-top: 8px !important;
-  padding-bottom: 8px !important;
-}
-
-/* Enhanced Pie Chart */
-.recharts-pie-sector {
-  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
-    filter 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
-    opacity 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
-    stroke-width 0.3s ease;
-  filter: drop-shadow(0 0 0 rgba(0, 0, 0, 0));
-  stroke-width: 2px;
-}
-
-.recharts-pie-sector:hover {
-  transform: scale(1.02) translateY(-2px);
-  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.25));
-  opacity: 0.95;
-  stroke-width: 3px;
-}
-
-[data-theme="dark"] .recharts-pie-sector:hover {
-  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.5));
-}
-
-/* Pie chart tooltip */
-.recharts-tooltip-wrapper {
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
-  z-index: 1000;
-}
-
-[data-theme="dark"] .recharts-tooltip-wrapper {
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
-}
-
-.recharts-default-tooltip {
-  border-radius: 8px !important;
-  padding: 10px 14px !important;
-  transition: all 0.3s ease !important;
-  border-width: 2px !important;
-  border-style: solid !important;
-}
-
-/* Enhance pie sectors for better border visibility */
-.recharts-pie {
-  stroke-linejoin: round;
-  outline: none;
-}
-
-/* Styling for tooltip status text */
-.recharts-tooltip-label {
-  font-weight: 600 !important;
-  margin-bottom: 6px !important;
-  font-size: 14px !important;
-  text-transform: capitalize;
-  color: inherit !important;
-  display: block !important;
-}
-
-.recharts-tooltip-item-list {
-  margin-top: 4px !important;
-}
-
-.recharts-tooltip-item {
-  padding: 3px 0 !important;
-}
-
-[data-theme="dark"] .recharts-tooltip-item-name,
-[data-theme="dark"] .recharts-tooltip-item-value,
-[data-theme="dark"] .recharts-tooltip-item-list,
-[data-theme="dark"] .recharts-default-tooltip p {
-  color: #EEEEEE !important;
-}
-
-[data-theme="dark"] .recharts-tooltip-cursor {
-  stroke: rgba(255, 255, 255, 0.2) !important;
-}
-
-/* Animation fixes */
-.recharts-surface {
-  overflow: visible;
-}
-
-/* Chart cards */
-.layout-card .recharts-wrapper {
-  margin: 0 auto;
-}
-
-.ant-card.layout-card {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
-}
-
-.ant-card.layout-card:hover {
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-  transform: translateY(-3px);
-}
-
-[data-theme="dark"] .ant-card.layout-card {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-[data-theme="dark"] .ant-card.layout-card:hover {
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
-}
-@media (max-width: 576px) {
-  .monthly-trends-card .recharts-cartesian-axis-tick text,
-  .monthly-trends-card .recharts-cartesian-axis-tick-line {
-    display: none !important;
-  }
-}
-
-
-/* Fix RTL layout for application details page */
-.application-detail-page[dir="rtl"] .ant-descriptions-item-label,
-.application-detail-page[dir="rtl"] .ant-descriptions-item-content {
-  text-align: right;
-}
-
-
-/* Additional RTL adjustments */
-[dir="rtl"] .ant-modal-title {
-  text-align: right;
-}
-
-[dir="rtl"] .ant-modal-close {
-  right: unset;
-  left: 17px;
-}
-
-[dir="rtl"] .ant-list-item-meta-avatar {
-  margin-right: 0;
-  margin-left: 16px;
-}
-
-[dir="rtl"] .ant-list-item-action {
-  margin-left: 0;
-  margin-right: 48px;
-}
-
-/* Ensure PDF page navigation is properly aligned in RTL context */
-[dir="rtl"] .page-navigation {
-  direction: ltr;
-  display: inline-block;
-}
+/* ---------------------------------------------------
+   Import Google Font
+   --------------------------------------------------- */
+   @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap');
+
+
+   /* ---------------------------------------------------
+      CSS Variables (Default Light Theme)
+      --------------------------------------------------- */
+   :root {
+     /* Font Settings */
+     font-family: Cairo, sans-serif;
+     line-height: 1.5;
+     font-weight: 400;
+     font-synthesis: none;
+     text-rendering: optimizeLegibility;
+     -webkit-font-smoothing: antialiased;
+     -moz-osx-font-smoothing: grayscale;
+   
+     /* System Colors */
+     color-scheme: light dark;
+     color: rgba(255, 255, 255, 0.87);
+     background-color: #242424;
+   
+     /* Theme Variables (fallbacks for SSR/initial render) */
+     --color-primary: #76A9FA;
+     --bg-color: #F8FAFC;
+     --card-bg: #FFFFFF;
+     --text-color: #2C3E50;
+     --text-color-secondary: #4A5568;
+     --border-color: #E2E8F0;
+   
+     /* Shadows */
+     --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.03);
+     --shadow-md: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 6px -1px rgba(0, 0, 0, 0.02);
+     --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.08);
+   
+     /* Border Radii */
+     --radius-sm: 8px;
+     --radius-md: 12px;
+     --radius-lg: 16px;
+   
+     /* Spacing Scale */
+     --spacing-xs: 4px;
+     --spacing-sm: 8px;
+     --spacing-md: 16px;
+     --spacing-lg: 24px;
+     --spacing-xl: 32px;
+   }
+   
+   /* ---------------------------------------------------
+      Dark Theme Overrides
+      --------------------------------------------------- */
+   [data-theme="dark"] {
+     --color-primary: #76ABAE;
+     --bg-color: #121212;
+     --card-bg: #1E1E1E;
+     --text-color: #FFFFFF;
+     --text-color-secondary: #CCCCCC;
+     --border-color: #333333;
+   
+     --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+     --shadow-md: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 6px -1px rgba(0, 0, 0, 0.25);
+     --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.5);
+   }
+   
+   
+   /* ---------------------------------------------------
+      Global Resets & Base Styles
+      --------------------------------------------------- */
+   * {
+     margin: 0;
+     padding: 0;
+     box-sizing: border-box;
+     transition: background-color 0.3s, border-color 0.3s, color 0.2s;
+   }
+   
+   html, body {
+     margin: 0;
+     min-width: 320px;
+     min-height: 100vh;
+     font-family: inherit;
+     background-color: transparent;
+   }
+   
+   #root {
+     width: 100%;
+     min-height: 100vh;
+   }
+   
+   
+   /* ---------------------------------------------------
+      Typography
+      --------------------------------------------------- */
+   a {
+     font-weight: 500;
+     color: #646cff;
+     text-decoration: inherit;
+   }
+   a:hover {
+     color: #535bf2;
+   }
+   
+   h1 {
+     font-size: 3.2em;
+     line-height: 1.1;
+   }
+   
+   
+   /* ---------------------------------------------------
+      Button
+      --------------------------------------------------- */
+   button {
+     border-radius: var(--radius-sm);
+     border: 1px solid transparent;
+     padding: 0.6em 1.2em;
+     font-size: 1em;
+     font-weight: 500;
+     font-family: inherit;
+     background-color: #1a1a1a;
+     cursor: pointer;
+     transition: border-color 0.25s;
+   }
+   button:hover {
+     border-color: #646cff;
+   }
+   button:focus,
+   button:focus-visible {
+     outline: 4px auto -webkit-focus-ring-color;
+   }
+   
+   
+   /* ---------------------------------------------------
+      Prefers-Color-Scheme: Light Adjustments
+      --------------------------------------------------- */
+   @media (prefers-color-scheme: light) {
+     :root {
+       color: #213547;
+       background-color: #ffffff;
+     }
+     a:hover {
+       color: #747bff;
+     }
+     button {
+       background-color: #f9f9f9;
+     }
+   }
+   
+   
+   /* ---------------------------------------------------
+      RTL Base Adjustments
+      --------------------------------------------------- */
+   html[dir="rtl"] {
+     text-align: right;
+   }
+   html[dir="rtl"] .ant-menu-submenu-title {
+     padding-right: var(--spacing-lg) !important;
+     padding-left: 0 !important;
+   }
+   
+   
+   /* ---------------------------------------------------
+      Arabic Language Specific
+      --------------------------------------------------- */
+   html[lang="ar"] {
+     font-family: "Cairo";
+   }
+   html[lang="ar"] * {
+     letter-spacing: 0;
+   }
+   html[lang="ar"] h1,
+   html[lang="ar"] h2,
+   html[lang="ar"] h3,
+   html[lang="ar"] h4,
+   html[lang="ar"] h5,
+   html[lang="ar"] h6,
+   html[lang="ar"] .ant-typography-h1,
+   html[lang="ar"] .ant-typography-h2,
+   html[lang="ar"] .ant-typography-h3,
+   html[lang="ar"] .ant-typography-h4,
+   html[lang="ar"] .ant-typography-h5,
+   html[lang="ar"] .ant-typography-h6 {
+     font-family: "Cairo";
+     font-weight: 700;
+   }
+   
+   
+   /* ---------------------------------------------------
+      Utility & Layout Helpers
+      --------------------------------------------------- */
+   /* Form grid */
+   .form-grid {
+     display: grid;
+     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+     gap: var(--spacing-lg);
+     margin-bottom: var(--spacing-lg);
+   }
+   .application-form .ant-form-item {
+     margin-bottom: var(--spacing-lg);
+   }
+   .application-form .status-select {
+     min-width: 100%;
+   }
+   
+   /* Content padding */
+   .ant-layout-content {
+     padding: var(--spacing-lg) !important;
+   }
+   
+   /* Page header */
+   .page-header {
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+     margin-bottom: var(--spacing-lg);
+     flex-wrap: wrap;
+     gap: var(--spacing-md);
+   }
+   .page-header h1 {
+     font-size: 28px;
+     margin: 0;
+     font-weight: 600;
+     line-height: 1.3;
+   }
+   
+   /* App title */
+   .app-title {
+     font-size: 1.2rem;
+     font-weight: bold;
+   }
+   
+   /* Status update */
+   .status-update-section {
+     margin-bottom: var(--spacing-lg);
+   }
+   .status-update-section h3 {
+     margin-bottom: var(--spacing-md);
+     font-size: 18px;
+     font-weight: 500;
+   }
+   .status-buttons {
+     display: flex;
+     flex-wrap: wrap;
+     gap: var(--spacing-sm);
+     margin-bottom: var(--spacing-md);
+   }
+   .status-button {
+     margin-bottom: var(--spacing-sm);
+   }
+   
+   /* Text alignment helpers */
+   .text-right { text-align: right; }
+   .text-left  { text-align: left; }
+   
+   
+   /* ---------------------------------------------------
+      Card Components
+      --------------------------------------------------- */
+   .ant-card {
+     margin-bottom: var(--spacing-lg);
+     border-radius: var(--radius-lg);
+     box-shadow: var(--shadow-sm), var(--shadow-md);
+     overflow: hidden;
+     background-color: var(--card-bg);
+   }
+   .ant-card-head {
+     padding: 0 var(--spacing-lg);
+     min-height: 60px;
+     border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+   }
+   .ant-card-body {
+     padding: var(--spacing-lg);
+   }
+   
+   /* Flexible chart card */
+   .layout-card {
+     height: 100%;
+     display: flex;
+     flex-direction: column;
+     transition: all 0.3s ease;
+   }
+   .layout-card .ant-card-body {
+     flex: 1;
+   }
+   .layout-card .recharts-wrapper {
+     margin: 0 auto;
+   }
+   .ant-card.layout-card:hover {
+     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+     transform: translateY(-3px);
+   }
+   
+   
+   /* ---------------------------------------------------
+      Table Components
+      --------------------------------------------------- */
+   .ant-table {
+     border-radius: var(--radius-lg);
+     overflow: hidden;
+     background-color: var(--card-bg);
+   }
+   .ant-table-cell,
+   .ant-table-thead > tr > th {
+     padding: 16px !important;
+   }
+   .ant-table-thead > tr > th {
+     font-weight: 500;
+   }
+   
+   /* Responsive table tweaks */
+   @media (max-width: 768px) {
+     .ant-table { font-size: 0.85rem; }
+     .ant-table-cell { padding: 12px !important; }
+     .responsive-hide-sm { display: none !important; }
+     .ant-layout-content { padding: 16px !important; }
+     .form-grid { gap: 16px; margin-bottom: 16px; }
+     .ant-card-body { padding: 16px; }
+     .ant-card-head { padding: 0 16px; min-height: 54px; }
+   }
+   
+   
+   /* ---------------------------------------------------
+      Ant Design Overrides: Buttons, Tags, Inputs
+      --------------------------------------------------- */
+   .ant-btn {
+     border-radius: var(--radius-sm);
+     padding: 6px 16px;
+     height: auto;
+   }
+   .ant-tag {
+     border-radius: var(--radius-lg);
+     font-size: 0.85rem;
+     padding: 3px 10px;
+     line-height: 1.4;
+   }
+   
+   .ant-select {
+     width: 100%;
+   }
+   .ant-input,
+   .ant-select-selector {
+     border-radius: var(--radius-sm) !important;
+     padding: 8px 12px !important;
+   }
+   .ant-select-selector {
+     height: auto !important;
+     min-height: 40px !important;
+   }
+   
+   
+   /* ---------------------------------------------------
+      Modal
+      --------------------------------------------------- */
+   .ant-modal-content {
+     border-radius: var(--radius-lg);
+     padding: var(--spacing-lg);
+   }
+   .ant-modal-header {
+     margin-bottom: var(--spacing-lg);
+   }
+   @media (max-width: 768px) {
+     .ant-modal {
+       max-width: calc(100vw - 32px) !important;
+       margin: 0 16px !important;
+     }
+   }
+   
+   
+   /* ---------------------------------------------------
+      Descriptions & Detail Panels
+      --------------------------------------------------- */
+   .ant-descriptions-item {
+     padding: 12px 0;
+   }
+   
+   
+   /* ---------------------------------------------------
+      Timeline
+      --------------------------------------------------- */
+   .timeline-container {
+     padding-top: 12px;
+   }
+   .timeline-actions {
+     margin-bottom: var(--spacing-md);
+     padding-bottom: 12px;
+     border-bottom: 1px dashed var(--border-color);
+   }
+   .note-input-area {
+     background-color: var(--bg-color);
+     padding: var(--spacing-md);
+     border-radius: var(--radius-md);
+     border: 1px solid var(--border-color);
+     margin-bottom: var(--spacing-md);
+   }
+   @media (max-width: 768px) {
+     .ant-timeline { margin-left: 0; }
+     .ant-timeline-item-tail,
+     .ant-timeline-item-head { left: 16px !important; }
+     .ant-timeline-item-content { margin-left: 40px; }
+   }
+   @media (max-width: 576px) {
+     .timeline-actions .ant-space {
+       flex-direction: column;
+       width: 100%;
+       gap: 8px;
+     }
+     .timeline-actions .ant-select,
+     .timeline-actions .ant-btn {
+       width: 100%;
+       min-height: 40px;
+     }
+     .date-header {
+       font-size: 12px;
+       margin: 8px 0;
+     }
+     .note-input-area { padding: 8px; }
+   }
+   
+   
+   /* ---------------------------------------------------
+      Mobile Bottom Navigation
+      --------------------------------------------------- */
+   .mobile-nav-menu .ant-menu-item {
+     padding: 0 !important;
+     margin: 0 !important;
+   }
+   .mobile-nav-menu .anticon {
+     font-size: 1.2rem;
+     margin: 0 !important;
+   }
+   .mobile-nav-menu.ant-menu-horizontal {
+     border-bottom: none;
+     line-height: normal;
+   }
+   
+   
+   /* ---------------------------------------------------
+      Calendar Styles
+      --------------------------------------------------- */
+   .calendar-page .ant-picker-calendar {
+     background: transparent;
+   }
+   .calendar-card {
+     padding: 0;
+     overflow: hidden;
+   }
+   .calendar-card .ant-card-body {
+     padding: 0;
+   }
+   .calendar-header {
+     padding: var(--spacing-md) var(--spacing-md) 0;
+     margin-bottom: var(--spacing-xl);
+     display: flex;
+     flex-direction: row;
+     justify-content: flex-end;
+     align-items: center;
+   }
+   [dir="rtl"] .calendar-header {
+     direction: ltr;
+     justify-content: flex-start;
+   }
+   .calendar-header .ant-select,
+   .calendar-header .ant-select-selector {
+     height: 32px !important;
+     display: flex;
+     align-items: center;
+   }
+   @media (max-width: 576px) {
+     .calendar-header .ant-space {
+       flex-direction: column;
+       align-items: flex-start;
+     }
+     [dir="rtl"] .calendar-header .ant-space {
+       flex-direction: column;
+       align-items: flex-end;
+     }
+     .calendar-header .ant-space-item {
+       margin-bottom: var(--spacing-lg) !important;
+     }
+   }
+   .calendar-events {
+     list-style: none;
+     padding: 0;
+     margin: 0;
+     max-height: 100px;
+     overflow-y: auto;
+   }
+   .calendar-event-item {
+     margin-bottom: 4px;
+     line-height: 1.5;
+   }
+   .calendar-event-badge {
+     cursor: pointer;
+     white-space: nowrap;
+     overflow: hidden;
+     text-overflow: ellipsis;
+     max-width: 100%;
+     display: block;
+   }
+   .events {
+     margin: 0;
+     padding: 0;
+     list-style: none;
+   }
+   .events .ant-badge-status {
+     width: 100%;
+     overflow: hidden;
+     font-size: 12px;
+     white-space: nowrap;
+     text-overflow: ellipsis;
+   }
+   .notes-month {
+     font-size: 28px;
+     text-align: center;
+   }
+   .notes-month section {
+     font-size: 28px;
+   }
+   .calendar-empty-state {
+     padding: 60px 0;
+   }
+   .ant-picker-calendar-date-content {
+     height: auto !important;
+     min-height: 80px;
+   }
+   /* Mobile “dots only” calendar */
+   @media (max-width: 576px) {
+     .calendar-events {
+       display: flex;
+       flex-wrap: wrap;
+       gap: 4px;
+       overflow: visible !important;
+       max-height: none !important;
+       padding: 2px;
+     }
+     .calendar-events li {
+       margin: 0 !important;
+       flex: 0 0 auto;
+       width: 8px;
+       height: 8px;
+       line-height: 1;
+     }
+     .calendar-events li .ant-badge-status-text {
+       display: none !important;
+     }
+   }
+   
+   
+   /* ---------------------------------------------------
+      Dashboard
+      --------------------------------------------------- */
+   .dashboard-header {
+     margin-bottom: 32px;
+   }
+   .dashboard-header h1 {
+     margin-bottom: 8px;
+     font-size: 32px;
+   }
+   .dashboard-header h4 {
+     font-weight: normal;
+     opacity: 0.8;
+     margin-bottom: var(--spacing-lg);
+   }
+   .dashboard-stats .ant-card {
+     height: 100%;
+     transition: all 0.3s ease;
+     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+     transform: translateY(0);
+     border: 1px solid var(--border-color);
+   }
+   .dashboard-stats .ant-card:hover {
+     transform: translateY(-5px);
+     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+     border-color: var(--color-primary);
+   }
+   [data-theme="dark"] .dashboard-stats .ant-card {
+     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+   }
+   [data-theme="dark"] .dashboard-stats .ant-card:hover {
+     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+     border-color: var(--color-primary);
+   }
+   .dashboard-stats .ant-statistic-content {
+     font-size: 28px;
+     font-weight: 600;
+   }
+   .dashboard-stats .ant-card-body {
+     display: flex;
+     flex-direction: column;
+     align-items: center;
+     justify-content: center;
+     text-align: center;
+   }
+   @media (max-width: 576px) {
+     .dashboard-stats .ant-col {
+       overflow: hidden;
+       transition: max-height 0.4s ease, opacity 0.4s ease;
+     }
+     .dashboard-stats:not(.expanded) > .ant-col:nth-child(n+3) {
+       max-height: 0;
+       opacity: 0;
+     }
+     .dashboard-stats.expanded > .ant-col:nth-child(n+3) {
+       max-height: 300px;
+       opacity: 1;
+     }
+   }
+   .dashboard-toggle {
+     text-align: center;
+     margin-top: var(--spacing-md);
+   }
+   .dashboard-toggle .ant-btn {
+     color: var(--color-primary);
+     font-weight: 600;
+     font-size: 14px;
+     padding: 0;
+     border: none;
+     transition: color 0.3s;
+   }
+   .dashboard-toggle .ant-btn:hover {
+     text-decoration: underline;
+   }
+   
+   
+   /* ---------------------------------------------------
+      Application Detail Page
+      --------------------------------------------------- */
+   .application-detail-page .page-header {
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+     margin-bottom: var(--spacing-lg);
+     padding-bottom: var(--spacing-md);
+     border-bottom: 1px solid var(--border-color);
+   }
+   .application-detail-page .header-left {
+     display: flex;
+     align-items: center;
+     gap: var(--spacing-sm);
+   }
+   .application-detail-page .header-left h1 {
+     margin: 0;
+     font-size: 28px;
+   }
+   .application-detail-page .section-title {
+     font-size: 20px;
+     font-weight: 600;
+     margin-bottom: var(--spacing-md);
+     padding-bottom: var(--spacing-sm);
+     border-bottom: 1px solid var(--border-color);
+   }
+   .application-detail-page .section-container {
+     margin-bottom: var(--spacing-lg);
+   }
+   
+   /* Day details modal */
+   .day-details {
+     max-height: 400px;
+     overflow-y: auto;
+     padding: 8px 0;
+   }
+   .day-details .ant-card-body {
+     padding: 12px;
+   }
+   .day-details .ant-card {
+     transition: all 0.2s;
+     cursor: pointer;
+   }
+   
+   /* RTL overrides for detail page */
+   .application-detail-page[dir="rtl"] .header-left {
+     flex-direction: row-reverse;
+   }
+   .application-detail-page[dir="rtl"] .ant-descriptions-item-label,
+   .application-detail-page[dir="rtl"] .ant-descriptions-item-content {
+     text-align: right;
+   }
+   
+   
+   /* ---------------------------------------------------
+      Recharts (Charts) Styling
+      --------------------------------------------------- */
+   .recharts-wrapper {
+     direction: ltr !important;
+   }
+   .chart-placeholder {
+     height: 300px;
+     display: flex;
+     justify-content: center;
+     align-items: center;
+     font-size: 1.2rem;
+     opacity: 0.6;
+   }
+   .recharts-cartesian-grid-bg {
+     fill: transparent;
+   }
+   .recharts-pie-label-text {
+     font-size: 0.8rem;
+     font-weight: bold;
+   }
+   
+   /* Dark mode chart lines & ticks */
+   [data-theme="dark"] .recharts-cartesian-axis-line,
+   [data-theme="dark"] .recharts-cartesian-axis-tick-line,
+   [data-theme="dark"] .recharts-cartesian-grid-horizontal line,
+   [data-theme="dark"] .recharts-cartesian-grid-vertical line {
+     stroke: rgba(255, 255, 255, 0.2);
+   }
+   [data-theme="dark"] .recharts-cartesian-axis-tick-value {
+     fill: rgba(255, 255, 255, 0.65);
+   }
+   [data-theme="dark"] .recharts-legend-item-text {
+     color: rgba(255, 255, 255, 0.65);
+   }
+   
+   /* Pie sectors animation */
+   .recharts-pie-sector {
+     transition:
+       transform 0.4s cubic-bezier(0.2,0.8,0.2,1),
+       filter 0.4s cubic-bezier(0.2,0.8,0.2,1),
+       opacity 0.4s cubic-bezier(0.2,0.8,0.2,1),
+       stroke-width 0.3s ease;
+     filter: drop-shadow(0 0 0 rgba(0,0,0,0));
+     stroke-width: 2px;
+   }
+   .recharts-pie-sector:hover {
+     transform: scale(1.02) translateY(-2px);
+     filter: drop-shadow(0 3px 6px rgba(0,0,0,0.25));
+     opacity: 0.95;
+     stroke-width: 3px;
+   }
+   [data-theme="dark"] .recharts-pie-sector:hover {
+     filter: drop-shadow(0 3px 6px rgba(0,0,0,0.5));
+   }
+   
+   /* Tooltip styling */
+   .recharts-tooltip-wrapper {
+     filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));
+     z-index: 1000;
+   }
+   [data-theme="dark"] .recharts-tooltip-wrapper {
+     filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+   }
+   .recharts-default-tooltip {
+     border-radius: var(--radius-sm) !important;
+     padding: 10px 14px !important;
+     transition: all 0.3s ease !important;
+     border-width: 2px !important;
+     border-style: solid !important;
+   }
+   .recharts-tooltip-label {
+     font-weight: 600 !important;
+     margin-bottom: 6px !important;
+     font-size: 14px !important;
+     text-transform: capitalize;
+     color: inherit !important;
+     display: block !important;
+   }
+   .recharts-tooltip-item-list {
+     margin-top: 4px !important;
+   }
+   .recharts-tooltip-item {
+     padding: 3px 0 !important;
+   }
+   [data-theme="dark"] .recharts-tooltip-item-name,
+   [data-theme="dark"] .recharts-tooltip-item-value,
+   [data-theme="dark"] .recharts-tooltip-item-list,
+   [data-theme="dark"] .recharts-default-tooltip p {
+     color: #EEEEEE !important;
+   }
+   [data-theme="dark"] .recharts-tooltip-cursor {
+     stroke: rgba(255, 255, 255, 0.2) !important;
+   }
+   .recharts-surface {
+     overflow: visible;
+   }
+   
+   
+   /* ---------------------------------------------------
+      Transitions & Focus for Ant Components
+      --------------------------------------------------- */
+   .ant-layout,
+   .ant-card,
+   .ant-menu,
+   .ant-table,
+   .ant-btn,
+   .ant-input,
+   .ant-select-selector,
+   .ant-modal-content {
+     transition: all 0.3s ease;
+   }
+   
+   .ant-btn:focus,
+   .ant-input:focus,
+   .ant-select-focused .ant-select-selector {
+     box-shadow: 0 0 0 2px rgba(118, 169, 250, 0.2);
+   }
+   [data-theme="dark"] .ant-btn:focus,
+   [data-theme="dark"] .ant-input:focus,
+   [data-theme="dark"] .ant-select-focused .ant-select-selector {
+     box-shadow: 0 0 0 2px rgba(118, 171, 174, 0.2);
+   }
+   
+   
+   /* ---------------------------------------------------
+      RTL Component Adjustments
+      --------------------------------------------------- */
+   [dir="rtl"] .ant-btn-icon-only {
+     transform: scaleX(-1);
+   }
+   [dir="rtl"] .ant-form-item-label {
+     text-align: right;
+   }
+   [dir="rtl"] .ant-picker-suffix {
+     margin-right: var(--spacing-sm);
+     margin-left: 0;
+   }
+   [dir="rtl"] .ant-picker-clear {
+     right: auto;
+     left: 0;
+   }
+   [dir="rtl"] .ant-select-arrow {
+     right: auto;
+     left: 11px;
+   }
+   [dir="rtl"] .ant-select-selection-item {
+     text-align: right;
+   }
+   [dir="rtl"] .ant-input-affix-wrapper .ant-input-suffix {
+     margin-left: 0;
+     margin-right: var(--spacing-sm);
+   }
+   [dir="rtl"] .ant-btn > .anticon:not(.ant-btn-rtl-icon-only) {
+     transform: scaleX(-1);
+   }
+   [dir="rtl"] .ant-modal-title {
+     text-align: right;
+   }
+   [dir="rtl"] .ant-modal-close {
+     right: unset;
+     left: 17px;
+   }
+   [dir="rtl"] .ant-list-item-meta-avatar {
+     margin-right: 0;
+     margin-left: 16px;
+   }
+   [dir="rtl"] .ant-list-item-action {
+     margin-left: 0;
+     margin-right: 48px;
+   }
+   [dir="rtl"] .ant-layout-sider {
+     box-shadow: -2px 0 8px rgba(0, 0, 0, 0.06);
+   }
+   [dir="rtl"] .ant-table-cell {
+     text-align: right;
+   }
+   [dir="rtl"] .page-navigation {
+     direction: ltr;
+     display: inline-block;
+   }
+   
+   /* Navigation menu spacing */
+   .nav-menu .ant-menu-item {
+     margin: 12px 0 !important;
+     padding-top: 8px !important;
+     padding-bottom: 8px !important;
+   }
+   
+   
+   /* ---------------------------------------------------
+      Icon Styles
+      --------------------------------------------------- */
+   .bi {
+     display: inline-block;
+     vertical-align: middle;
+     line-height: 1;
+     color: var(--text-color);
+   }
+   .bi-globe2 {
+     font-size: 1.2rem !important;
+   }
+   .custom-icon {
+     display: inline-flex !important;
+     align-items: center !important;
+     justify-content: center !important;
+     vertical-align: -0.125em !important;
+   }
+   .ant-btn .custom-icon {
+     margin-right: var(--spacing-sm);
+   }
+   [dir="rtl"] .ant-btn .custom-icon {
+     margin-right: 0;
+     margin-left: var(--spacing-sm);
+   }
+   
+   
+   /* ---------------------------------------------------
+      Theme & Language Toggle Buttons
+      --------------------------------------------------- */
+   .theme-toggle-btn,
+   .lang-toggle-btn {
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     width: 40px;
+     height: 40px;
+     transition: transform 0.3s ease;
+   }
+   .theme-toggle-btn:hover {
+     transform: rotate(30deg);
+   }
+   .lang-toggle-btn {
+     min-width: 42px;
+   }
+   
+   
+   /* ---------------------------------------------------
+      End of Stylesheet
+      --------------------------------------------------- */
+   

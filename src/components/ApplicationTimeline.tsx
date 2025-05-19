@@ -1,5 +1,3 @@
-// src/components/ApplicationTimeline.tsx
-
 import React, { useState, useMemo } from 'react';
 import {
   Timeline,
@@ -12,7 +10,8 @@ import {
   Col,
   Modal,
   DatePicker,
-  Form
+  Form,
+  type TimelineProps
 } from 'antd';
 import {
   ClockCircleOutlined,
@@ -24,13 +23,14 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import { formatDate } from '../utils/helpers';       // ← import helper
+import { formatDate } from '../utils/helpers';
 import type {
   Application,
   ApplicationStatus,
   InterviewDetails
 } from '../types/application';
 import { useLanguage } from '../hooks/useLanguage';
+import '../index.css';
 
 dayjs.extend(relativeTime);
 
@@ -38,15 +38,32 @@ const { Text } = Typography;
 const { TextArea } = Input;
 const { Option } = Select;
 
+// --- Styled wrappers for responsive tweaks ---
+const ResponsiveContainer = styled.div`
+  padding: 0 16px;
+  @media (max-width: 576px) {
+    padding: 0 8px;
+  }
+
+  .date-header {
+    margin: 16px 0 8px;
+    text-align: center;
+    font-size: 14px;
+  }
+
+  .ant-timeline {
+    margin: 0;
+  }
+
+  .ant-timeline-item-content {
+    word-break: break-word;
+  }
+`;
+
 const TimelineIndent = styled.div`
   margin-left: 32px;
   color: var(--text-color-secondary);
   font-style: italic;
-`;
-
-const DateHeader = styled.div`
-  margin: 16px 0 8px;
-  text-align: center;
 `;
 
 const statusColors: Record<ApplicationStatus, string> = {
@@ -111,24 +128,27 @@ const ApplicationTimeline: React.FC<Props> = ({
   onUpdateStatus
 }) => {
   const { t } = useTranslation();
-  const { direction, language } = useLanguage();          // ← grab language
+  const { direction, language } = useLanguage();
   const isRTL = direction === 'rtl';
 
-  // note input
+  // ── Always left-align dots ───────────────────────────────
+  const timelineMode: TimelineProps['mode'] = 'left';
+
+  // Note input state
   const [noteText, setNoteText] = useState('');
   const [showNoteInput, setShowNoteInput] = useState(false);
   const [adding, setAdding] = useState(false);
 
-  // status update
+  // Status update state
   const [newStatus, setNewStatus] = useState<ApplicationStatus>();
   const [updating, setUpdating] = useState(false);
 
-  // schedule modal
+  // Scheduling modal state
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [scheduleFor, setScheduleFor] = useState<ApplicationStatus | null>(null);
   const [form] = Form.useForm();
 
-  // group by date (ISO day)
+  // Group events by day
   const groupedEvents = useMemo(() => {
     const flat = generateTimelineEvents(application);
     const byDay: Record<string, ApplicationEvent[]> = {};
@@ -200,54 +220,61 @@ const ApplicationTimeline: React.FC<Props> = ({
   };
 
   return (
-    <div className="timeline-container" dir={direction}>
+    <ResponsiveContainer dir={direction} className="timeline-container">
       <Space direction="vertical" style={{ width: '100%' }} size="large">
+
         {/* header controls */}
-        <Row justify="space-between" align="middle">
-          {!showNoteInput && onUpdateStatus && (
-            <Col>
-              <Space size="middle">
-                <Select<ApplicationStatus>
-                  size="large"
-                  placeholder={t('applications.updateStatus')}
-                  value={newStatus}
-                  onChange={setNewStatus}
-                  style={{ minWidth: 200, height: 40 }}
-                >
-                  {Object.keys(statusColors).map(s => (
-                    <Option key={s} value={s as ApplicationStatus}>
-                      {t(`status.${s}`)}
-                    </Option>
-                  ))}
-                </Select>
-                {newStatus && (
-                  <Button
+        <Row
+          wrap
+          gutter={[8, 8]}
+          justify="start"
+          align="middle"
+          className="timeline-actions"
+        >
+          <Col xs={24} sm="auto">
+            <Space size="middle">
+              {onUpdateStatus && !showNoteInput && (
+                <>
+                  <Select<ApplicationStatus>
                     size="large"
-                    type="primary"
-                    loading={updating}
-                    onClick={handleStatusDone}
-                    style={{ height: 40 }}
+                    placeholder={t('applications.updateStatus')}
+                    value={newStatus}
+                    onChange={setNewStatus}
+                    style={{ minWidth: 150, height: 40 }}
                   >
-                    {t('common.done')}
-                  </Button>
-                )}
-              </Space>
-            </Col>
-          )}
-          {!newStatus && (
-            <Col>
-              <Button
-                size="large"
-                icon={<FileTextOutlined />}
-                type={showNoteInput ? 'primary' : 'default'}
-                loading={adding}
-                onClick={() => setShowNoteInput(v => !v)}
-                style={{ height: 40 }}
-              >
-                {t('applications.addNote')}
-              </Button>
-            </Col>
-          )}
+                    {Object.keys(statusColors).map(s => (
+                      <Option key={s} value={s as ApplicationStatus}>
+                        {t(`status.${s}`)}
+                      </Option>
+                    ))}
+                  </Select>
+                  {newStatus && (
+                    <Button
+                      size="large"
+                      type="primary"
+                      loading={updating}
+                      onClick={handleStatusDone}
+                      style={{ height: 40 }}
+                    >
+                      {t('common.done')}
+                    </Button>
+                  )}
+                </>
+              )}
+              {!showNoteInput && !newStatus && (
+                <Button
+                  size="large"
+                  icon={<FileTextOutlined />}
+                  type="default"
+                  loading={adding}
+                  onClick={() => setShowNoteInput(v => !v)}
+                  style={{ height: 40 }}
+                >
+                  {t('applications.addNote')}
+                </Button>
+              )}
+            </Space>
+          </Col>
         </Row>
 
         {/* note input */}
@@ -282,91 +309,78 @@ const ApplicationTimeline: React.FC<Props> = ({
         {!showNoteInput &&
           groupedEvents.map(([day, evts]) => (
             <div key={day}>
-              <DateHeader>
-                {/* ← use formatDate for the header */}
+              <div className="date-header">
                 <Text strong>{formatDate(day, language)}</Text>
-              </DateHeader>
-              <div style={{ direction: 'ltr' }}>
-                <Timeline mode="left">
-                  {evts.map(evt => {
-                    const isStatus = evt.type === 'status_change';
-                    const dot =
-                      evt.type === 'created'
-                        ? <ClockCircleOutlined />
-                        : isStatus
-                          ? <FormOutlined />
-                          : <FileTextOutlined />;
-                    const color =
-                      isStatus && evt.status
-                        ? statusColors[evt.status]
-                        : 'blue';
-
-                    return (
-                      <Timeline.Item key={evt.id} dot={dot} color={color}>
-                        {isStatus ? (
-                          <div style={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center'
-                          }}>
-                            <Text strong>
-                              {t('timeline.statusChanged')} {t(`status.${evt.status}`)}
-                            </Text>
-                            {evt.interviewDetails && (
-                              <Space size="small">
-                                <CalendarOutlined />
-                                <Text italic>
-                                  {/* ← use formatDate for interview date */}
-                                  {formatDate(evt.interviewDetails.dateTime, language)}{' '}
-                                  <Text italic type="secondary">
-                                    ({dayjs(evt.interviewDetails.dateTime).fromNow()})
-                                  </Text>
-                                </Text>
-                              </Space>
-                            )}
-                          </div>
-                        ) : evt.type === 'note' ? (
-                          <div style={{
-                            display: 'flex',
-                            alignItems: 'flex-start',
-                            gap: 16
-                          }}>
-                            <Text strong>{t('timeline.noteAdded')}</Text>
-                            <TimelineIndent style={{
-                              textAlign: isRTL ? 'left' : 'right'
-                            }}>
-                              {evt.note}
-                            </TimelineIndent>
-                          </div>
-                        ) : (
-                          <Text strong>{t('timeline.created')}</Text>
-                        )}
-
-                        <div>
-                          <Text type="secondary">
-                            {dayjs(evt.date).format('HH:mm')}{' '}
-                            <Text italic type="secondary">
-                              ({dayjs(evt.date).fromNow()})
-                            </Text>
-                          </Text>
-                        </div>
-                      </Timeline.Item>
-                    );
-                  })}
-                </Timeline>
               </div>
+              <Timeline mode={timelineMode} items={evts.map(evt => {
+                const isStatus = evt.type === 'status_change';
+                const dot = evt.type === 'created'
+                  ? <ClockCircleOutlined />
+                  : isStatus
+                    ? <FormOutlined />
+                    : <FileTextOutlined />;
+                const color = isStatus && evt.status
+                  ? statusColors[evt.status]
+                  : 'blue';
+
+                return {
+                  key: evt.id,
+                  dot,
+                  color,
+                  children: (
+                    <>
+                      {isStatus ? (
+                        <div style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center'
+                        }}>
+                          <Text strong>
+                            {t('timeline.statusChanged')} {t(`status.${evt.status}`)}
+                          </Text>
+                          {evt.interviewDetails && (
+                            <Space size="small">
+                              <CalendarOutlined />
+                              <Text italic>
+                                {formatDate(evt.interviewDetails.dateTime, language)}
+                              </Text>
+                            </Space>
+                          )}
+                        </div>
+                      ) : evt.type === 'note' ? (
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'flex-start',
+                          gap: 16
+                        }}>
+                          <Text strong>{t('timeline.noteAdded')}</Text>
+                          <TimelineIndent style={{
+                            textAlign: isRTL ? 'left' : 'right'
+                          }}>
+                            {evt.note}
+                          </TimelineIndent>
+                        </div>
+                      ) : (
+                        <Text strong>{t('timeline.created')}</Text>
+                      )}
+                      <div>
+                        <Text type="secondary">
+                          {dayjs(evt.date).format('HH:mm')}
+                        </Text>
+                      </div>
+                    </>
+                  )
+                };
+              })} />
             </div>
-        ))}
+          ))
+        }
 
         {/* schedule modal */}
         <Modal
-          title={
-            scheduleFor
-              ? t(
-                  `applications.schedule${scheduleFor.charAt(0).toUpperCase() + scheduleFor.slice(1)}`
-                )
-              : ''
-          }
+          title={scheduleFor ? t(
+            `applications.schedule${scheduleFor.charAt(0).toUpperCase() + scheduleFor.slice(1)}`
+          ) : ''}
           open={showScheduleModal}
           onOk={handleScheduleOk}
           onCancel={handleScheduleCancel}
@@ -394,8 +408,9 @@ const ApplicationTimeline: React.FC<Props> = ({
             </Form.Item>
           </Form>
         </Modal>
+
       </Space>
-    </div>
+    </ResponsiveContainer>
   );
 };
 

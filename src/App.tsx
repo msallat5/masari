@@ -29,7 +29,13 @@ const AppContent: React.FC = () => {
     },
   }), [theme]);
 
-  const router = createBrowserRouter(routes);
+  // Create router with basename for GitHub Pages deployment
+  const router = createBrowserRouter(routes, {
+    basename: import.meta.env.BASE_URL // This uses the base value from vite.config.ts
+  });
+
+  // Log the router's basename to help with debugging
+  console.log('Router basename:', import.meta.env.BASE_URL);
 
   return (
     <ConfigProvider theme={antTheme} direction={direction}>
@@ -37,6 +43,7 @@ const AppContent: React.FC = () => {
     </ConfigProvider>
   );
 };
+
 
 const App: React.FC = () => (
   <ThemeProvider>

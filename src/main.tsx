@@ -1,7 +1,6 @@
 // src/main.tsx
 import { StrictMode, Suspense } from 'react'
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter } from 'react-router-dom'
 import './index.css'
 import App from './App'
 
@@ -17,12 +16,13 @@ const Loading = () => (
   </div>
 )
 
+// Log the base URL to help with debugging
+console.log('BASE_URL:', import.meta.env.BASE_URL);
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <Suspense fallback={<Loading />}>
-      <BrowserRouter basename={import.meta.env.BASE_URL}>
-        <App />
-      </BrowserRouter>
+      <App />
     </Suspense>
   </StrictMode>
 )

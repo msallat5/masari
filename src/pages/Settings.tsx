@@ -1,3 +1,4 @@
+
 // src/pages/Settings.tsx
 import React from 'react';
 import { Card, Switch, Radio, Typography, Space } from 'antd';
@@ -89,7 +90,6 @@ const Footer = styled.div`
   border-top: 1px solid rgba(255,255,255,0.12);
   text-align: center;
   font-size: 18px;
-  color: rgba(255,255,255,0.6);
 
   .line {
     margin: 4px 0;
@@ -216,8 +216,12 @@ const Settings: React.FC = () => {
       </SettingsCard>
 
       <Footer>
-        <div className="line">{t('settings.madeWithLove')}</div>
-        <div className="line">{t('settings.by')}</div>
+        <Text type="secondary" style={{ display: 'block', margin: '4px 0', fontSize: '20px' }}>
+          {t('settings.madeWithLove')}
+        </Text>
+        <Text type="secondary" style={{ display: 'block', margin: '4px 0', fontSize: '20px' }}>
+          {t('settings.by')}
+        </Text>
         <div className="links">
           <a
             href="https://www.linkedin.com/in/mustafa-sallat/"

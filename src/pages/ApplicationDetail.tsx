@@ -1,6 +1,9 @@
 // src/pages/ApplicationDetail.tsx
-import { useState, useEffect } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+
+// UI components & icons
 import {
   Card,
   Button,
@@ -20,20 +23,32 @@ import {
   ArrowRightOutlined,
   LinkOutlined,
 } from '@ant-design/icons';
+
+// Internationalization & direction
 import { useTranslation } from 'react-i18next';
-import type { Application, ApplicationStatus } from '../types/application';
+import { useLanguage } from '../hooks/useLanguage';
+
+// Services & utilities
 import { applicationService } from '../services/api';
 import { formatDate } from '../utils/helpers';
+
+// Components
 import ApplicationForm from '../components/ApplicationForm';
 import ApplicationTimeline from '../components/ApplicationTimeline';
-import { useLanguage } from '../hooks/useLanguage';
+
+// Types
 import type {
+  Application,
+  ApplicationStatus,
   NoteHistoryItem,
   StatusHistoryItem,
   CalendarEvent,
   InterviewDetails,
 } from '../types/application';
 
+/**
+ * Mapping of application statuses to Ant Design tag colors.
+ */
 const statusColors: Record<ApplicationStatus, string> = {
   saved: 'default',
   applied: 'blue',
@@ -49,22 +64,28 @@ const statusColors: Record<ApplicationStatus, string> = {
 };
 
 const ApplicationDetail: React.FC = () => {
+  // --- Router hooks ---
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+
+  // --- i18n & layout direction ---
   const { t, i18n } = useTranslation();
   const { direction } = useLanguage();
   const isRTL = direction === 'rtl';
 
+  // --- Component state ---
   const [application, setApplication] = useState<Application | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [editing, setEditing] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
-  const [deleting, setDeleting] = useState(false);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [editing, setEditing] = useState<boolean>(false);
+  const [saving, setSaving] = useState<boolean>(false);
+  const [deleteModalVisible, setDeleteModalVisible] = useState<boolean>(false);
+  const [deleting, setDeleting] = useState<boolean>(false);
 
+  // --- Fetch application on mount or when `id` changes ---
   useEffect(() => {
-    (async () => {
-      if (!id) return;
+    if (!id) return;
+
+    const loadApplication = async () => {
       setLoading(true);
       try {
         const data = await applicationService.getById(id);
@@ -74,12 +95,18 @@ const ApplicationDetail: React.FC = () => {
       } finally {
         setLoading(false);
       }
-    })();
+    };
+
+    loadApplication();
   }, [id, t]);
 
+  /**
+   * Handle saving edits to the application.
+   */
   const handleUpdate = async (patch: Partial<Application>) => {
     if (!id) return;
     setSaving(true);
+
     try {
       const updated = await applicationService.update(id, patch);
       if (updated) {
@@ -94,9 +121,13 @@ const ApplicationDetail: React.FC = () => {
     }
   };
 
+  /**
+   * Handle deleting the application.
+   */
   const handleDelete = async () => {
     if (!id) return;
     setDeleting(true);
+
     try {
       const ok = await applicationService.delete(id);
       if (ok) {
@@ -111,33 +142,46 @@ const ApplicationDetail: React.FC = () => {
     }
   };
 
+  /**
+   * Add a note to the application's history.
+   */
   const handleAddNote = async (note: string) => {
     if (!id || !application) return;
+
     const now = new Date().toISOString();
     const newNote: NoteHistoryItem = { note, date: now };
     const updatedNotes = [...(application.notesHistory || []), newNote];
+
+    // Optimistically update UI
     setApplication(app => app && { ...app, notesHistory: updatedNotes });
+
     try {
       await applicationService.update(id, { notesHistory: updatedNotes });
       message.success(t('common.success'));
     } catch {
       message.error(t('common.error'));
-      throw new Error();
+      throw new Error('Failed to save note');
     }
   };
 
+  /**
+   * Change the application status and optionally add interview details.
+   */
   const handleStatusUpdate = async (
     newStatus: ApplicationStatus,
     opts?: { interviewDetails?: InterviewDetails }
   ) => {
     if (!id || !application || application.status === newStatus) return;
+
     const now = new Date().toISOString();
-    const entry: StatusHistoryItem = {
+    const statusEntry: StatusHistoryItem = {
       status: newStatus,
       date: now,
       interviewDetails: opts?.interviewDetails,
     };
-    const updatedHistory = [...(application.statusHistory || []), entry];
+
+    // Build new status history and calendar events arrays
+    const updatedHistory = [...(application.statusHistory || []), statusEntry];
     const updatedEvents = opts?.interviewDetails
       ? [
           ...(application.calendarEvents || []),
@@ -145,14 +189,15 @@ const ApplicationDetail: React.FC = () => {
             id: `evt-${now}`,
             applicationId: application.id,
             title: t(`status.${newStatus}`),
-            date: opts.interviewDetails!.dateTime,
+            date: opts.interviewDetails.dateTime,
             type: newStatus as CalendarEvent['type'],
-            location: opts.interviewDetails!.location,
-            notes: opts.interviewDetails!.notes,
+            location: opts.interviewDetails.location,
+            notes: opts.interviewDetails.notes,
           },
         ]
       : application.calendarEvents || [];
 
+    // Optimistically update UI
     setApplication(app =>
       app && {
         ...app,
@@ -176,8 +221,12 @@ const ApplicationDetail: React.FC = () => {
     }
   };
 
-  if (loading) return <Skeleton active />;
+  // --- Render loading state ---
+  if (loading) {
+    return <Skeleton active />;
+  }
 
+  // --- Render error if no application found ---
   if (!application) {
     return (
       <div style={{ textAlign: isRTL ? 'right' : 'left' }}>
@@ -193,6 +242,7 @@ const ApplicationDetail: React.FC = () => {
     );
   }
 
+  // --- Render edit form if in editing mode ---
   if (editing) {
     return (
       <Card title={t('applications.edit')}>
@@ -206,15 +256,19 @@ const ApplicationDetail: React.FC = () => {
     );
   }
 
+  // --- Main detail view ---
   return (
     <div className="application-detail-page" style={{ direction }}>
+      {/* Page header with back button and action buttons */}
       <div className="page-header">
         <div className="header-left">
           <Button
             icon={isRTL ? <ArrowRightOutlined /> : <ArrowLeftOutlined />}
             onClick={() => navigate('/applications')}
           />
-          <h1>{application.company} — {application.position}</h1>
+          <h1>
+            {application.company} — {application.position}
+          </h1>
         </div>
         <div className="header-actions">
           <Space>
@@ -236,7 +290,9 @@ const ApplicationDetail: React.FC = () => {
         </div>
       </div>
 
+      {/* Details and timeline sections */}
       <Row gutter={[24, 24]}>
+        {/* Left: Static application details */}
         <Col xs={24} lg={12}>
           <Descriptions
             bordered
@@ -289,6 +345,8 @@ const ApplicationDetail: React.FC = () => {
             )}
           </Descriptions>
         </Col>
+
+        {/* Right: Timeline with notes & status updates */}
         <Col xs={24} lg={12}>
           <ApplicationTimeline
             application={application}
@@ -298,6 +356,7 @@ const ApplicationDetail: React.FC = () => {
         </Col>
       </Row>
 
+      {/* Delete confirmation modal */}
       <Modal
         title={t('common.confirm')}
         open={deleteModalVisible}

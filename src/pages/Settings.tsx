@@ -1,27 +1,21 @@
-
-// src/pages/Settings.tsx
 import React from 'react';
-import { Card, Switch, Radio, Typography, Space } from 'antd';
-import {
-  LinkedinFilled,
-  GithubOutlined,
-  BehanceSquareFilled,
-} from '@ant-design/icons';
+import { Typography, Card, Switch, Radio, Space } from 'antd';
+import { LinkedinFilled, GithubOutlined, BehanceSquareFilled } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
 import { useTheme } from '../hooks/useTheme';
 import { useLanguage } from '../hooks/useLanguage';
 import type { RadioChangeEvent } from 'antd';
-import styled from 'styled-components';
 
 const { Title, Text } = Typography;
 
-// full-width outer wrapper
+/** Full-width page container with padding */
 const SettingsContainer = styled.div`
   width: 100%;
   padding: 20px;
 `;
 
-// full-width card
+/** Card wrapper with custom border-radius and shadow */
 const SettingsCard = styled(Card)`
   width: 100%;
   border-radius: 12px;
@@ -30,7 +24,7 @@ const SettingsCard = styled(Card)`
     0 1px 6px -1px rgba(0, 0, 0, 0.02);
 `;
 
-// each setting on one flex row, stacks on xs
+/** Row for each setting: flex layout, stacks on small screens */
 const SettingItem = styled.div`
   display: flex;
   align-items: flex-start;
@@ -47,7 +41,7 @@ const SettingItem = styled.div`
   }
 `;
 
-// wraps label + description
+/** Wraps label and description text */
 const TextWrapper = styled.div`
   flex: 1;
   margin-right: 24px;
@@ -59,20 +53,20 @@ const TextWrapper = styled.div`
   }
 `;
 
-// label styling
+/** Styled label for each setting */
 const SettingLabel = styled(Text)`
   display: block;
   font-weight: 500;
   margin-bottom: 4px;
 `;
 
-// description styling
+/** Styled description under each label */
 const SettingDescription = styled(Text)`
   display: block;
   opacity: 0.7;
 `;
 
-// control container
+/** Wrapper for each control element */
 const ControlWrapper = styled.div`
   display: flex;
   align-items: center;
@@ -83,7 +77,7 @@ const ControlWrapper = styled.div`
   }
 `;
 
-// footer with split lines and spaced icons
+/** Footer with separator lines and social links */
 const Footer = styled.div`
   margin-top: 32px;
   padding-top: 16px;
@@ -95,7 +89,7 @@ const Footer = styled.div`
     margin: 4px 0;
   }
 
-  & > .links {
+  .links {
     display: inline-flex;
     justify-content: center;
     gap: 16px;
@@ -114,32 +108,47 @@ const Footer = styled.div`
 `;
 
 const Settings: React.FC = () => {
+  // Translation hook
   const { t } = useTranslation();
+
+  // Theme mode and toggle function from custom hook
   const { themeMode, toggleTheme } = useTheme();
+
+  // Language code and toggle from custom hook
   const { language, toggleLanguage } = useLanguage();
 
+  /**
+   * Handle toggling between light and dark mode.
+   * Only call toggleTheme if the switch state differs from current mode.
+   */
   const handleThemeChange = (checked: boolean) => {
-    if ((checked && themeMode === 'light') || (!checked && themeMode === 'dark')) {
+    const shouldBeDark = checked;
+    if ((shouldBeDark && themeMode === 'light') || (!shouldBeDark && themeMode === 'dark')) {
       toggleTheme();
     }
   };
 
+  /**
+   * Handle switching between English and Arabic.
+   * Only call toggleLanguage when the selected value differs from current language.
+   */
   const handleLanguageChange = (e: RadioChangeEvent) => {
-    if ((e.target.value === 'ar' && language === 'en') ||
-        (e.target.value === 'en' && language === 'ar')) {
+    const selected = e.target.value as 'en' | 'ar';
+    if ((selected === 'ar' && language === 'en') || (selected === 'en' && language === 'ar')) {
       toggleLanguage();
     }
   };
 
   return (
     <SettingsContainer>
+      {/* Page title */}
       <Title level={2} style={{ marginBottom: 24 }}>
         {t('nav.settings')}
       </Title>
 
       <SettingsCard>
 
-        {/* Theme */}
+        {/* Theme setting */}
         <SettingItem>
           <TextWrapper>
             <SettingLabel>{t('settings.theme')}</SettingLabel>
@@ -148,30 +157,17 @@ const Settings: React.FC = () => {
             </SettingDescription>
           </TextWrapper>
           <ControlWrapper>
-            <Text
-              style={{
-                marginRight: language === 'ar' ? 0 : 8,
-                marginLeft: language === 'ar' ? 8 : 0,
-              }}
-            >
+            <Text style={{ marginRight: language === 'ar' ? 0 : 8, marginLeft: language === 'ar' ? 8 : 0 }}>
               {t('settings.lightMode')}
             </Text>
-            <Switch
-              checked={themeMode === 'dark'}
-              onChange={handleThemeChange}
-            />
-            <Text
-              style={{
-                marginLeft: language === 'ar' ? 0 : 8,
-                marginRight: language === 'ar' ? 8 : 0,
-              }}
-            >
+            <Switch checked={themeMode === 'dark'} onChange={handleThemeChange} />
+            <Text style={{ marginLeft: language === 'ar' ? 0 : 8, marginRight: language === 'ar' ? 8 : 0 }}>
               {t('settings.darkMode')}
             </Text>
           </ControlWrapper>
         </SettingItem>
 
-        {/* Language */}
+        {/* Language setting */}
         <SettingItem>
           <TextWrapper>
             <SettingLabel>{t('settings.language')}</SettingLabel>
@@ -186,10 +182,7 @@ const Settings: React.FC = () => {
               buttonStyle="solid"
               size="large"
             >
-              <Radio.Button
-                value="ar"
-                style={{ fontFamily: "'Cairo', sans-serif" }}
-              >
+              <Radio.Button value="ar" style={{ fontFamily: "'Cairo', sans-serif" }}>
                 العربية
               </Radio.Button>
               <Radio.Button value="en">English</Radio.Button>
@@ -197,7 +190,7 @@ const Settings: React.FC = () => {
           </ControlWrapper>
         </SettingItem>
 
-        {/* Notifications */}
+        {/* Notifications (coming soon) */}
         <SettingItem>
           <TextWrapper>
             <SettingLabel>{t('settings.notifications')}</SettingLabel>
@@ -215,6 +208,7 @@ const Settings: React.FC = () => {
 
       </SettingsCard>
 
+      {/* Footer with credit and social links */}
       <Footer>
         <Text type="secondary" style={{ display: 'block', margin: '4px 0', fontSize: '20px' }}>
           {t('settings.madeWithLove')}
@@ -223,25 +217,13 @@ const Settings: React.FC = () => {
           {t('settings.by')}
         </Text>
         <div className="links">
-          <a
-            href="https://www.linkedin.com/in/mustafa-sallat/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <a href="https://www.linkedin.com/in/mustafa-sallat/" target="_blank" rel="noopener noreferrer">
             <LinkedinFilled />
           </a>
-          <a
-            href="https://github.com/msallat5"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <a href="https://github.com/msallat5" target="_blank" rel="noopener noreferrer">
             <GithubOutlined />
           </a>
-          <a
-            href="https://www.behance.net/mustafasallat"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <a href="https://www.behance.net/mustafasallat" target="_blank" rel="noopener noreferrer">
             <BehanceSquareFilled />
           </a>
         </div>

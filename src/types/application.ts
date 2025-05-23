@@ -1,10 +1,10 @@
-// src/types/application.ts
-
 // ——————————————————————————————————————————————
-// All of your core application-tracking types live here.
+// Core application-tracking types
 // ——————————————————————————————————————————————
 
-/** A step in your application’s lifecycle */
+/**
+ * A step in an application’s lifecycle.
+ */
 export type ApplicationStatus =
   | 'saved'
   | 'applied'
@@ -18,7 +18,9 @@ export type ApplicationStatus =
   | 'rejected'
   | 'declined';
 
-/** How you’re applying (full-time, contract, etc.) */
+/**
+ * The form of employment you’re applying for.
+ */
 export type JobType =
   | 'full_time'
   | 'part_time'
@@ -28,82 +30,125 @@ export type JobType =
   | 'hybrid'
   | 'onsite';
 
-/** An event already synced into your Calendar component */
+// ——————————————————————————————————————————————
+// Calendar & scheduling
+// ——————————————————————————————————————————————
+
+/**
+ * An event synced into the calendar (e.g. interview, phone screen).
+ */
 export interface CalendarEvent {
+  /** Unique event identifier */
   id: string;
+  /** Title to display in the calendar */
   title: string;
-  date: string; // ISO 8601
+  /** ISO 8601 date or datetime of the event */
+  date: string;
+  /** Type of event */
   type: 'interview' | 'phone_screen' | 'assessment' | 'final_round';
+  /** Optional location or call-in info */
   location?: string;
+  /** Optional free-form notes */
   notes?: string;
+  /** ID of the application this event belongs to */
   applicationId: string;
 }
 
-// ——————————————————————————————————————————————
-// NEW: structured details for any scheduled interview/screen/etc.
-// ——————————————————————————————————————————————
+/**
+ * Structured details for scheduling an interview or screen.
+ */
 export interface InterviewDetails {
-  /** ISO 8601 date-time when the interview/screen/etc. is set */
+  /** ISO 8601 date-time when the meeting is set */
   dateTime: string;
-  /** Optional venue or call-in info */
+  /** Optional venue or dial-in information */
   location?: string;
-  /** Any free-form notes about the meeting */
+  /** Any additional notes about the meeting */
   notes?: string;
 }
 
 // ——————————————————————————————————————————————
-// NEW: one history entry per status change
+// History log entries
 // ——————————————————————————————————————————————
+
+/**
+ * One record for each status change in an application.
+ */
 export interface StatusHistoryItem {
-  /** Which status was set */
+  /** The new status that was set */
   status: ApplicationStatus;
-  /** ISO 8601 timestamp of when it changed */
+  /** When the status change occurred (ISO 8601) */
   date: string;
-  /** Only present for interview/phone_screen/etc. statuses */
+  /** Only for statuses that involve a meeting (interview, phone screen, etc.) */
   interviewDetails?: InterviewDetails;
 }
 
-// ——————————————————————————————————————————————
-// NEW: one history entry per free-form note
-// ——————————————————————————————————————————————
+/**
+ * One record for each free-form note added to an application.
+ */
 export interface NoteHistoryItem {
-  /** The note’s text */
+  /** The note text */
   note: string;
-  /** ISO 8601 timestamp */
+  /** When the note was added (ISO 8601) */
   date: string;
 }
 
 // ——————————————————————————————————————————————
-// Your main Application record, with full history baked in
+// Main application record
 // ——————————————————————————————————————————————
-export interface Application {
-  id: string;
-  company: string;
-  position: string;
-  dateApplied: string;       // ISO 8601
-  location: string;
-  source: string;
-  status: ApplicationStatus;
-  jobType?: JobType;
-  jobUrl?: string;
-  notes?: string;            // legacy free-form blob
-  createdAt: string;         // ISO 8601
-  updatedAt: string;         // ISO 8601
 
-  /** Calendar events already synced */
+/**
+ * A job application, including status and note history.
+ */
+export interface Application {
+  /** Unique application identifier */
+  id: string;
+  /** Company name */
+  company: string;
+  /** Job title or position */
+  position: string;
+  /** Date applied (ISO 8601) */
+  dateApplied: string;
+  /** Location of the role (city, remote, etc.) */
+  location: string;
+  /** How you found the job (e.g., referral, LinkedIn) */
+  source: string;
+  /** Current status in the application process */
+  status: ApplicationStatus;
+  /** Optional employment type */
+  jobType?: JobType;
+  /** Optional link to the job posting */
+  jobUrl?: string;
+  /** Legacy free-form notes blob */
+  notes?: string;
+  /** When this record was created (ISO 8601) */
+  createdAt: string;
+  /** When this record was last updated (ISO 8601) */
+  updatedAt: string;
+
+  /** Any calendar events already synced for this application */
   calendarEvents?: CalendarEvent[];
 
-  /** Full log of every status change, in chronological order */
+  /** Chronological log of every status change */
   statusHistory?: StatusHistoryItem[];
 
-  /** Full log of every free-form note you’ve added */
+  /** Chronological log of every note added */
   notesHistory?: NoteHistoryItem[];
 }
 
-/** For filtering/searching your applications list */
+// ——————————————————————————————————————————————
+// Filtering & search
+// ——————————————————————————————————————————————
+
+/**
+ * Criteria for filtering the applications list.
+ */
 export interface ApplicationFilters {
+  /** Filter by application status */
   status?: ApplicationStatus;
-  dateRange?: [string, string]; // [ISO start, ISO end]
+  /** Filter by applied-date range [start, end] (ISO 8601) */
+  dateRange?: [string, string];
+  /** Filter by source string */
   source?: string;
+  /** Generic text search over company/position/etc. */
   search?: string;
 }

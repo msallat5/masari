@@ -1,13 +1,23 @@
 import type { RouteObject } from 'react-router-dom';
+
+// Layout wrapper that provides sidebar, header, theming, etc.
 import Layout from './components/Layout';
+
+// Page components
 import Dashboard from './pages/Dashboard';
 import Applications from './pages/Applications';
 import ApplicationDetail from './pages/ApplicationDetail';
 import Calendar from './pages/Calendar';
 import Settings from './pages/Settings';
 
+/**
+ * Application routes configuration.
+ * Each route is wrapped in the main <Layout> component
+ * to ensure consistent navigation and styling.
+ */
 const routes: RouteObject[] = [
   {
+    // Dashboard at the root path
     path: '/',
     element: (
       <Layout>
@@ -16,6 +26,7 @@ const routes: RouteObject[] = [
     ),
   },
   {
+    // List of all applications
     path: '/applications',
     element: (
       <Layout>
@@ -24,6 +35,7 @@ const routes: RouteObject[] = [
     ),
   },
   {
+    // Detail view for a single application
     path: '/applications/:id',
     element: (
       <Layout>
@@ -32,6 +44,7 @@ const routes: RouteObject[] = [
     ),
   },
   {
+    // Calendar view showing scheduled events
     path: '/calendar',
     element: (
       <Layout>
@@ -40,6 +53,7 @@ const routes: RouteObject[] = [
     ),
   },
   {
+    // Settings page for theme/language/preferences
     path: '/settings',
     element: (
       <Layout>

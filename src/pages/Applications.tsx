@@ -1,6 +1,11 @@
-// src/pages/Applications.tsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+
+// Ant Design responsive hook
+import { Grid } from 'antd';
+const { useBreakpoint } = Grid;
+
+// Ant Design components & utilities
 import {
   Table,
   List,
@@ -10,18 +15,28 @@ import {
   Tag,
   Modal,
   message,
-  Grid,
 } from 'antd';
+
+// Ant Design icons
 import { SearchOutlined, PlusOutlined } from '@ant-design/icons';
+
+// Internationalization
 import { useTranslation } from 'react-i18next';
-import type { TableProps } from 'antd';
-import type { Application } from '../types/application';
+
+// Services & helpers
 import { applicationService } from '../services/api';
-import ApplicationForm from '../components/ApplicationForm';
 import { formatDate } from '../utils/helpers';
 
-const { useBreakpoint } = Grid;
+// Form component
+import ApplicationForm from '../components/ApplicationForm';
 
+// Types
+import type { TableProps } from 'antd';
+import type { Application } from '../types/application';
+
+/**
+ * Map each application status to a Tag color.
+ */
 const statusColors: Record<string, string> = {
   saved: 'default',
   applied: 'blue',
@@ -37,58 +52,70 @@ const statusColors: Record<string, string> = {
 };
 
 const Applications: React.FC = () => {
-  const { t, i18n } = useTranslation();
+  // --- Hooks: navigation, translation, responsiveness ---
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
   const screens = useBreakpoint();
   const isMobile = !screens.md;
 
+  // --- Component state ---
   const [applications, setApplications] = useState<Application[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [searchText, setSearchText] = useState('');
-  const [formVisible, setFormVisible] = useState(false);
-  const [creating, setCreating] = useState(false);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [searchText, setSearchText] = useState<string>('');
+  const [formVisible, setFormVisible] = useState<boolean>(false);
+  const [creating, setCreating] = useState<boolean>(false);
 
+  // --- Load all applications once on mount ---
   useEffect(() => {
     fetchApplications();
   }, []);
 
+  /**
+   * Fetch applications from the API.
+   */
   const fetchApplications = async () => {
     setLoading(true);
     try {
       const data = await applicationService.getAll();
       setApplications(data);
     } catch (err) {
-      message.error(t('common.error'));
       console.error(err);
+      message.error(t('common.error'));
     } finally {
       setLoading(false);
     }
   };
 
+  /**
+   * Handle creation of a new application.
+   */
   const handleCreate = async (
     values: Omit<Application, 'id' | 'createdAt' | 'updatedAt'>
   ) => {
     setCreating(true);
     try {
       const newApp = await applicationService.create(values);
-      setApplications([newApp, ...applications]);
+      setApplications(prev => [newApp, ...prev]);
       setFormVisible(false);
       message.success(t('common.success'));
     } catch (err) {
-      message.error(t('common.error'));
       console.error(err);
+      message.error(t('common.error'));
     } finally {
       setCreating(false);
     }
   };
 
+  // --- Filter applications by company or position ---
   const filtered = applications.filter(app =>
-    [app.company, app.position]
-      .join(' ')
+    `${app.company} ${app.position}`
       .toLowerCase()
       .includes(searchText.toLowerCase())
   );
 
+  /**
+   * Define columns for desktop Table view.
+   */
   const columns: TableProps<Application>['columns'] = [
     {
       title: t('applications.company'),
@@ -111,8 +138,7 @@ const Applications: React.FC = () => {
       ellipsis: true,
       render: date => formatDate(date, i18n.language),
       sorter: (a, b) =>
-        new Date(a.dateApplied).getTime() -
-        new Date(b.dateApplied).getTime(),
+        new Date(a.dateApplied).getTime() - new Date(b.dateApplied).getTime(),
       responsive: ['sm'],
     },
     {
@@ -127,33 +153,32 @@ const Applications: React.FC = () => {
       dataIndex: 'status',
       key: 'status',
       render: status => (
-        <Tag color={statusColors[status]}>
-          {t(`status.${status}`)}
-        </Tag>
+        <Tag color={statusColors[status]}>{t(`status.${status}`)}</Tag>
       ),
       responsive: ['sm'],
       filters: Object.keys(statusColors).map(st => ({
         text: t(`status.${st}`),
         value: st,
       })),
-      onFilter: (value, rec) => rec.status === value,
+      onFilter: (value, record) => record.status === value,
     },
     {
       title: t('common.actions'),
       key: 'actions',
-      render: (_, rec) => (
+      render: (_, record) => (
         <Space size="small">
+          {/* View and Edit both navigate to the detail page (could be split later) */}
           <Button
             type="link"
             size="small"
-            onClick={() => navigate(`/applications/${rec.id}`)}
+            onClick={() => navigate(`/applications/${record.id}`)}
           >
             {t('common.view')}
           </Button>
           <Button
             type="link"
             size="small"
-            onClick={() => navigate(`/applications/${rec.id}`)}
+            onClick={() => navigate(`/applications/${record.id}`)}
           >
             {t('common.edit')}
           </Button>
@@ -165,13 +190,12 @@ const Applications: React.FC = () => {
 
   return (
     <div className="applications-page">
-      {/* Header + New Button */}
+      {/* --- Page Header with title and New button --- */}
       <div
         className="page-header"
         style={{
           display: 'flex',
           alignItems: 'center',
-          flexWrap: 'nowrap',
           marginBottom: 16,
         }}
       >
@@ -180,14 +204,13 @@ const Applications: React.FC = () => {
           type="primary"
           icon={<PlusOutlined />}
           onClick={() => setFormVisible(true)}
-          // ← this auto-margins on the inline-start side (left in LTR, right in RTL)
           style={{ marginInlineStart: 'auto' }}
         >
           {t('applications.newApplication')}
         </Button>
       </div>
 
-      {/* Search */}
+      {/* --- Search Input --- */}
       <Input
         placeholder={t('common.search')}
         prefix={<SearchOutlined />}
@@ -196,8 +219,8 @@ const Applications: React.FC = () => {
         style={{ marginBottom: 16 }}
       />
 
+      {/* --- Responsive List or Table --- */}
       {isMobile ? (
-        /* Mobile List + pagination */
         <List
           dataSource={filtered}
           loading={loading}
@@ -208,7 +231,7 @@ const Applications: React.FC = () => {
               onClick={() => navigate(`/applications/${app.id}`)}
               style={{
                 padding: '12px 16px',
-                borderBottom: '1px solid rgba(255,255,255,0.15)',
+                borderBottom: '1px solid rgba(0,0,0,0.1)',
               }}
             >
               <List.Item.Meta
@@ -222,26 +245,21 @@ const Applications: React.FC = () => {
           )}
         />
       ) : (
-        /* Desktop Table */
         <Table
           columns={columns}
           dataSource={filtered}
           rowKey="id"
           loading={loading}
-          onRow={rec => ({
-            onClick: () => navigate(`/applications/${rec.id}`),
+          onRow={record => ({
+            onClick: () => navigate(`/applications/${record.id}`),
           })}
           scroll={{ x: 'max-content' }}
           size="middle"
-          pagination={{
-            pageSize: 10,
-            showSizeChanger: false,
-            position: ['bottomCenter'],
-          }}
+          pagination={{ pageSize: 10, showSizeChanger: false, position: ['bottomCenter'] }}
         />
       )}
 
-      {/* New/Edit Modal */}
+      {/* --- Modal for New Application Form --- */}
       <Modal
         title={t('applications.newApplication')}
         open={formVisible}

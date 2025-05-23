@@ -1,28 +1,34 @@
-// src/main.tsx
-import { StrictMode, Suspense } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App'
+import { StrictMode, Suspense } from 'react';
+import type { FC } from 'react';
+import { createRoot } from 'react-dom/client';
+import App from './App';
+import './index.css';
 
-// Loading component while i18n resources are loading
-const Loading = () => (
-  <div style={{
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: '100vh'
-  }}>
+/**
+ * Fallback UI shown while i18n and other async resources load.
+ */
+const Loading: FC = () => (
+  <div
+    style={{
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      height: '100vh',
+    }}
+  >
     Loading...
   </div>
-)
+);
 
-// Log the base URL to help with debugging
-console.log('BASE_URL:', import.meta.env.BASE_URL);
+// Get the root DOM node and create a React root
+const container = document.getElementById('root')!;
+const root = createRoot(container);
 
-createRoot(document.getElementById('root')!).render(
+// Render the application inside React.StrictMode and Suspense
+root.render(
   <StrictMode>
     <Suspense fallback={<Loading />}>
       <App />
     </Suspense>
   </StrictMode>
-)
+);

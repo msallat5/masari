@@ -1,30 +1,54 @@
-// src/services/api.ts
 import type { Application } from '../types/application';
 
-// Using localStorage as our “API”
+// ─────────────────────────────────────────────────────────────────────────────
+// Constants & Helpers
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** Key under which applications are stored in localStorage */
 const STORAGE_KEY = 'masari_applications';
 
-const generateId = () => Math.random().toString(36).substring(2, 9);
+/**
+ * Generate a short pseudo‐random ID for new applications.
+ */
+function generateId(): string {
+  return Math.random().toString(36).substring(2, 9);
+}
 
+// ─────────────────────────────────────────────────────────────────────────────
+// applicationService
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * A simple "API" using localStorage for CRUD operations on Application records.
+ */
 export const applicationService = {
-  /** Fetch entire list */
-  getAll: async (): Promise<Application[]> => {
-    const data = localStorage.getItem(STORAGE_KEY);
-    return Promise.resolve(data ? JSON.parse(data) : []);
+  /**
+   * Fetch all stored applications.
+   * @returns An array of Application objects (empty if none exist).
+   */
+  async getAll(): Promise<Application[]> {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) as Application[] : [];
   },
 
-  /** Single record by ID */
-  getById: async (id: string): Promise<Application | null> => {
-    const data = localStorage.getItem(STORAGE_KEY);
-    if (!data) return null;
-    const apps: Application[] = JSON.parse(data);
-    return Promise.resolve(apps.find(a => a.id === id) || null);
+  /**
+   * Retrieve a single application by its ID.
+   * @param id — The application ID to look up.
+   * @returns The matching Application or null if not found.
+   */
+  async getById(id: string): Promise<Application | null> {
+    const list = await this.getAll();
+    return list.find(app => app.id === id) ?? null;
   },
 
-  /** Create a brand-new application */
-  create: async (
+  /**
+   * Create and persist a new application.
+   * @param payload — All required Application fields except id/createdAt/updatedAt.
+   * @returns The newly created Application.
+   */
+  async create(
     payload: Omit<Application, 'id' | 'createdAt' | 'updatedAt'>
-  ): Promise<Application> => {
+  ): Promise<Application> {
     const now = new Date().toISOString();
     const newApp: Application = {
       ...payload,
@@ -36,46 +60,51 @@ export const applicationService = {
       notesHistory: [],
     };
 
-    const list = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]') as Application[];
+    const list = await this.getAll();
     list.push(newApp);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
 
-    return Promise.resolve(newApp);
+    return newApp;
   },
 
-  /** Update any subset of fields */
-  update: async (
+  /**
+   * Update one or more fields of an existing application.
+   * @param id — The ID of the application to update.
+   * @param patch — Partial fields to merge into the existing record.
+   * @returns The updated Application, or null if no matching ID was found.
+   */
+  async update(
     id: string,
     patch: Partial<Application>
-  ): Promise<Application | null> => {
-    const data = localStorage.getItem(STORAGE_KEY);
-    if (!data) return null;
+  ): Promise<Application | null> {
+    const list = await this.getAll();
+    const index = list.findIndex(app => app.id === id);
+    if (index === -1) return null;
 
-    const list: Application[] = JSON.parse(data);
-    const idx = list.findIndex(a => a.id === id);
-    if (idx === -1) return null;
-
-    const updated: Application = {
-      ...list[idx],
+    const updatedApp: Application = {
+      ...list[index],
       ...patch,
       updatedAt: new Date().toISOString(),
     };
 
-    list[idx] = updated;
+    list[index] = updatedApp;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
-    return Promise.resolve(updated);
+    return updatedApp;
   },
 
-  /** Remove one by ID */
-  delete: async (id: string): Promise<boolean> => {
-    const data = localStorage.getItem(STORAGE_KEY);
-    if (!data) return Promise.resolve(false);
-
-    const list: Application[] = JSON.parse(data);
-    const filtered = list.filter(a => a.id !== id);
-    if (filtered.length === list.length) return Promise.resolve(false);
-
+  /**
+   * Delete an application by ID.
+   * @param id — The ID of the application to remove.
+   * @returns True if deletion succeeded (ID found), false otherwise.
+   */
+  async delete(id: string): Promise<boolean> {
+    const list = await this.getAll();
+    const filtered = list.filter(app => app.id !== id);
+    if (filtered.length === list.length) {
+      // No record had the matching ID
+      return false;
+    }
     localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
-    return Promise.resolve(true);
+    return true;
   },
 };

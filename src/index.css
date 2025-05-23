@@ -607,7 +607,7 @@
    }
    .dashboard-toggle {
      text-align: center;
-     margin-top: var(--spacing-md);
+     margin-top: var(--shadow-sm);
    }
    .dashboard-toggle .ant-btn {
      color: var(--color-primary);

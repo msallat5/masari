@@ -1,41 +1,47 @@
-import { useState, createContext, useContext, useEffect } from 'react';
-import type { ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
+import type { FC, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
-type Language = 'ar' | 'en';
-type Direction = 'rtl' | 'ltr';
+/** Supported language codes */
+export type Language = 'ar' | 'en';
+/** Corresponding text direction */
+export type Direction = 'rtl' | 'ltr';
 
+/** Context shape providing language settings and a toggler */
 interface LanguageContextType {
   language: Language;
   direction: Direction;
   toggleLanguage: () => void;
 }
 
+/** React Context for language; undefined when used outside a provider */
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
-export const LanguageProvider = ({ children }: { children: ReactNode }) => {
+/**
+ * Wrap your app in LanguageProvider to:
+ * - Persist the chosen language in localStorage
+ * - Sync i18next language
+ * - Provide `language`, `direction`, and `toggleLanguage` to descendants
+ */
+export const LanguageProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const { i18n } = useTranslation();
-  // Check if user has previously set language
-  const storedLanguage = localStorage.getItem('language') as Language | null;
-  const defaultLanguage = storedLanguage || 'ar';
-  
-  const [language, setLanguage] = useState<Language>(defaultLanguage);
+
+  // Load saved language or default to Arabic
+  const stored = localStorage.getItem('language') as Language | null;
+  const [language, setLanguage] = useState<Language>(stored ?? 'ar');
   const direction: Direction = language === 'ar' ? 'rtl' : 'ltr';
-  
-  // Update document direction when language changes
+
+  // Whenever `language` changes, update i18next and localStorage
   useEffect(() => {
-    // Change i18n language
     i18n.changeLanguage(language);
-    
-    // Save language preference
     localStorage.setItem('language', language);
-  }, [language, direction, i18n]);
-  
-  // Toggle between Arabic and English
+  }, [language, i18n]);
+
+  /** Toggle between 'ar' and 'en' */
   const toggleLanguage = () => {
-    setLanguage(prevLang => prevLang === 'ar' ? 'en' : 'ar');
+    setLanguage(prev => (prev === 'ar' ? 'en' : 'ar'));
   };
-  
+
   return (
     <LanguageContext.Provider value={{ language, direction, toggleLanguage }}>
       {children}
@@ -43,10 +49,14 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
+/**
+ * Hook to access language settings.
+ * Throws if used outside of LanguageProvider.
+ */
 export const useLanguage = (): LanguageContextType => {
   const context = useContext(LanguageContext);
   if (!context) {
     throw new Error('useLanguage must be used within a LanguageProvider');
   }
   return context;
-}; 
+};

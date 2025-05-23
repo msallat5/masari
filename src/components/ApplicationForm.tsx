@@ -1,20 +1,66 @@
-// src/components/ApplicationForm.tsx
+import React from 'react';
 import { Form, Input, DatePicker, Select, Button } from 'antd';
 import { LinkOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
+import dayjs, { Dayjs } from 'dayjs';
 import type { Application } from '../types/application';
-import dayjs from 'dayjs';
 
 const { TextArea } = Input;
 const { Option } = Select;
 
+/** Props for the application form */
 interface ApplicationFormProps {
+  /** Initial values to populate the form (for edit) */
   initialValues?: Partial<Application>;
-  onSubmit: (values: Omit<Application, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
+  /** Called when the form is submitted with normalized values */
+  onSubmit: (
+    values: Omit<Application, 'id' | 'createdAt' | 'updatedAt'>
+  ) => Promise<void>;
+  /** Called when the user cancels out of the form */
   onCancel: () => void;
+  /** Whether the primary submit button shows a loading spinner */
   loading?: boolean;
 }
 
+/** Static options for the status dropdown */
+const STATUS_OPTIONS = [
+  'saved',
+  'applied',
+  'phone_screen',
+  'interview',
+  'assessment',
+  'final_round',
+  'offer',
+  'negotiating',
+  'accepted',
+  'rejected',
+  'declined',
+] as const;
+
+/** Static options for the job type dropdown */
+const JOB_TYPE_OPTIONS = [
+  'full_time',
+  'part_time',
+  'contract',
+  'internship',
+  'remote',
+  'hybrid',
+  'onsite',
+] as const;
+
+/** Static options for the source dropdown */
+const SOURCE_OPTIONS = [
+  'LinkedIn',
+  'Indeed',
+  'Company Website',
+  'Referral',
+  'Job Fair',
+  'Other',
+] as const;
+
+/**
+ * Form component to create or update a job application.
+ */
 const ApplicationForm: React.FC<ApplicationFormProps> = ({
   initialValues,
   onSubmit,
@@ -24,59 +70,32 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
   const { t } = useTranslation();
   const [form] = Form.useForm();
 
-  const statusOptions = [
-    { value: 'saved', label: t('status.saved') },
-    { value: 'applied', label: t('status.applied') },
-    { value: 'phone_screen', label: t('status.phone_screen') },
-    { value: 'interview', label: t('status.interview') },
-    { value: 'assessment', label: t('status.assessment') },
-    { value: 'final_round', label: t('status.final_round') },
-    { value: 'offer', label: t('status.offer') },
-    { value: 'negotiating', label: t('status.negotiating') },
-    { value: 'accepted', label: t('status.accepted') },
-    { value: 'rejected', label: t('status.rejected') },
-    { value: 'declined', label: t('status.declined') },
-  ];
-
-  const jobTypeOptions = [
-    { value: 'full_time', label: t('jobType.full_time') },
-    { value: 'part_time', label: t('jobType.part_time') },
-    { value: 'contract', label: t('jobType.contract') },
-    { value: 'internship', label: t('jobType.internship') },
-    { value: 'remote', label: t('jobType.remote') },
-    { value: 'hybrid', label: t('jobType.hybrid') },
-    { value: 'onsite', label: t('jobType.onsite') },
-  ];
-
-  const sourceOptions = [
-    { value: 'LinkedIn', label: 'LinkedIn' },
-    { value: 'Indeed', label: 'Indeed' },
-    { value: 'Company Website', label: t('applications.companyWebsite') },
-    { value: 'Referral', label: t('applications.referral') },
-    { value: 'Job Fair', label: t('applications.jobFair') },
-    { value: 'Other', label: t('applications.other') },
-  ];
-
+  /**
+   * Handle form submission:
+   * - Ensure jobUrl starts with http(s)://
+   * - Format the dateApplied field to YYYY-MM-DD
+   * - Pass cleaned payload back to parent
+   */
   const handleFinish = (values: any) => {
-    // Normalize jobUrl: ensure it has a protocol
     let url = values.jobUrl?.trim() ?? '';
     if (url && !/^https?:\/\//i.test(url)) {
-      url = 'https://' + url;
+      url = `https://${url}`;
     }
 
-    const formatted: Omit<Application, 'id' | 'createdAt' | 'updatedAt'> = {
+    const payload: Omit<Application, 'id' | 'createdAt' | 'updatedAt'> = {
       ...values,
-      dateApplied: (values.dateApplied as dayjs.Dayjs).format('YYYY-MM-DD'),
+      dateApplied: (values.dateApplied as Dayjs).format('YYYY-MM-DD'),
       jobUrl: url || undefined,
     };
 
-    onSubmit(formatted);
+    onSubmit(payload);
   };
 
   return (
     <Form
       form={form}
       layout="vertical"
+      className="application-form"
       initialValues={{
         ...initialValues,
         dateApplied: initialValues?.dateApplied
@@ -84,8 +103,8 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
           : dayjs(),
       }}
       onFinish={handleFinish}
-      className="application-form"
     >
+      {/* Company & Position fields */}
       <div className="form-grid">
         <Form.Item
           name="company"
@@ -94,7 +113,6 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
         >
           <Input />
         </Form.Item>
-
         <Form.Item
           name="position"
           label={t('applications.position')}
@@ -104,11 +122,11 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
         </Form.Item>
       </div>
 
+      {/* Location & Date Applied fields */}
       <div className="form-grid">
         <Form.Item name="location" label={t('applications.location')}>
           <Input />
         </Form.Item>
-
         <Form.Item
           name="dateApplied"
           label={t('applications.dateApplied')}
@@ -118,6 +136,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
         </Form.Item>
       </div>
 
+      {/* Job Type & Status fields */}
       <div className="form-grid">
         <Form.Item
           name="jobType"
@@ -125,50 +144,55 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
           rules={[{ required: true, message: t('applications.jobTypeRequired') }]}
         >
           <Select>
-            {jobTypeOptions.map(opt => (
-              <Option key={opt.value} value={opt.value}>
-                {opt.label}
+            {JOB_TYPE_OPTIONS.map((type) => (
+              <Option key={type} value={type}>
+                {t(`jobType.${type}`)}
               </Option>
             ))}
           </Select>
         </Form.Item>
-
         <Form.Item
           name="status"
           label={t('applications.status')}
           rules={[{ required: true, message: t('applications.statusRequired') }]}
-          className="status-select"
         >
           <Select>
-            {statusOptions.map(opt => (
-              <Option key={opt.value} value={opt.value}>
-                {opt.label}
+            {STATUS_OPTIONS.map((status) => (
+              <Option key={status} value={status}>
+                {t(`status.${status}`)}
               </Option>
             ))}
           </Select>
         </Form.Item>
       </div>
 
+      {/* Source & Job URL fields */}
       <div className="form-grid">
         <Form.Item name="source" label={t('applications.source')}>
           <Select>
-            {sourceOptions.map(opt => (
-              <Option key={opt.value} value={opt.value}>
-                {opt.label}
+            {SOURCE_OPTIONS.map((src) => (
+              <Option key={src} value={src}>
+                {src.startsWith('applications.')
+                  ? t(src)
+                  : src}
               </Option>
             ))}
           </Select>
         </Form.Item>
-
         <Form.Item name="jobUrl" label={t('applications.jobUrl')}>
-          <Input prefix={<LinkOutlined />} placeholder="https://example.com/job" />
+          <Input
+            prefix={<LinkOutlined />}
+            placeholder="https://example.com/job"
+          />
         </Form.Item>
       </div>
 
+      {/* Notes field */}
       <Form.Item name="notes" label={t('applications.notes')}>
         <TextArea rows={4} />
       </Form.Item>
 
+      {/* Form actions */}
       <Form.Item>
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
           <Button onClick={onCancel}>{t('common.cancel')}</Button>
